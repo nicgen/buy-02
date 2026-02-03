@@ -1,0 +1,22 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: media-service
+  data:
+    mongodb:
+      uri: mongodb://admin:password@localhost:27017/buy01_media?authSource=admin
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+  server:
+    forward-headers-strategy: framework
+
+file:
+  upload-dir: uploads
+
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
