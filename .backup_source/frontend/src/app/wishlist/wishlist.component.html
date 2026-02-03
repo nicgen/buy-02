@@ -1,0 +1,29 @@
+<div class="wishlist-container">
+    <h1>My Wishlist</h1>
+
+    <div *ngIf="loading" class="loading">
+        Loading...
+    </div>
+
+    <div *ngIf="!loading && products.length === 0" class="empty-wishlist">
+        <p>Your wishlist is empty.</p>
+        <button mat-raised-button color="primary" routerLink="/products">Browse Products</button>
+    </div>
+
+    <div class="products-grid" *ngIf="!loading && products.length > 0">
+        <mat-card *ngFor="let product of products" class="product-card">
+            <img mat-card-image [src]="product.imageUrls?.[0] || 'assets/placeholder.png'" alt="Product Image">
+            <mat-card-content>
+                <h2>{{ product.name }}</h2>
+                <p class="description">{{ product.description }}</p>
+                <p class="price">${{ product.price }}</p>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" (click)="addToCart(product)">Add to Cart</button>
+                <button mat-icon-button color="warn" (click)="removeFromWishlist(product)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</div>

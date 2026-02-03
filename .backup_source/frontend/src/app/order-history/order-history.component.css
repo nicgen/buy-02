@@ -1,0 +1,15 @@
+.order-history-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.order-card {
+  margin-bottom: 20px;
+}
+
+.total {
+  margin-top: 10px;
+  text-align: right;
+  font-size: 1.2em;
+}

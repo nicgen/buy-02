@@ -1,0 +1,9 @@
+blueocean
+docker-workflow
+git
+workflow-aggregator
+email-ext
+mailer
+sonar
+github
+ws-cleanup

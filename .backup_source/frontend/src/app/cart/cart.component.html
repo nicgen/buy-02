@@ -1,0 +1,85 @@
+<div class="cart-container">
+    <h1>Shopping Cart</h1>
+
+    <div *ngIf="cartItems.length === 0" class="empty-cart">
+        <p>Your cart is empty.</p>
+        <button mat-raised-button color="primary" routerLink="/products">Continue Shopping</button>
+    </div>
+
+    <div *ngIf="cartItems.length > 0" class="cart-content">
+        <mat-card class="cart-items">
+            <mat-list>
+                <mat-list-item *ngFor="let item of cartItems">
+                    <div class="cart-item">
+                        <div *ngIf="item.imageUrl" class="image-container">
+                            <img [src]="item.imageUrl" alt="{{ item.name }}" class="item-image">
+                        </div>
+                        <div *ngIf="!item.imageUrl" class="image-placeholder">
+                            <mat-icon>image_not_supported</mat-icon>
+                        </div>
+                        <div class="item-details">
+                            <span class="item-name">{{ item.name }}</span>
+                            <span class="item-price">${{ item.price }} x {{ item.quantity }}</span>
+                        </div>
+                        <button mat-icon-button color="warn" (click)="removeFromCart(item.id)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </mat-list-item>
+            </mat-list>
+        </mat-card>
+
+        <mat-card class="cart-summary">
+            <mat-card-header>
+                <mat-card-title>Summary</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="total">
+                    <span>Total:</span>
+                    <span>${{ total }}</span>
+                </div>
+
+                <div class="address-section">
+                    <h3>Shipping Address</h3>
+                    <form [formGroup]="addressForm">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Street</mat-label>
+                            <input matInput formControlName="street">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>City</mat-label>
+                            <input matInput formControlName="city">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Zip Code</mat-label>
+                            <input matInput formControlName="zip">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Country</mat-label>
+                            <input matInput formControlName="country">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Phone Number (Optional)</mat-label>
+                            <input matInput formControlName="phoneNumber">
+                        </mat-form-field>
+                    </form>
+                </div>
+
+                <div class="payment-methods">
+                    <h3>Payment Method</h3>
+                    <mat-radio-group [(ngModel)]="paymentMethod">
+                        <mat-radio-button value="PAY_ON_DELIVERY">Pay on Delivery</mat-radio-button>
+                        <br>
+                        <mat-radio-button value="STRIPE">Online Payment / Stripe</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-raised-button color="primary" class="full-width" (click)="checkout()">
+                    {{ paymentMethod === 'PAY_ON_DELIVERY' ? 'Pay on Delivery' : 'Pay with Stripe' }}
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</div>
