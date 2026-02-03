@@ -1,0 +1,482 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2025-12-08T10:00:00.000Z",
+    "__export_source": "insomnia.desktop.app:v2023.5.8",
+    "resources": [
+        {
+            "_id": "req_register_client",
+            "parentId": "fld_auth",
+            "modified": 1702026000000,
+            "created": 1701698400000,
+            "url": "{{ base_url }}/api/auth/register",
+            "name": "Register Client",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"email\": \"client@example.com\",\n\t\"password\": \"password\",\n\t\"role\": \"CLIENT\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1701698400000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request",
+            "afterResponseScript": "const body = JSON.parse(insomnia.response.body);\nif (body.token) {\n  insomnia.environment.set('auth_token', body.token);\n}"
+        },
+        {
+            "_id": "req_register_seller",
+            "parentId": "fld_auth",
+            "modified": 1702026000000,
+            "created": 1701698400000,
+            "url": "{{ base_url }}/api/auth/register",
+            "name": "Register Seller",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"email\": \"seller@example.com\",\n\t\"password\": \"password\",\n\t\"role\": \"SELLER\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1701698300000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request",
+            "afterResponseScript": "const body = JSON.parse(insomnia.response.body);\nif (body.token) {\n  insomnia.environment.set('auth_token', body.token);\n}"
+        },
+        {
+            "_id": "req_login",
+            "parentId": "fld_auth",
+            "modified": 1702026000000,
+            "created": 1701698400000,
+            "url": "{{ base_url }}/api/auth/login",
+            "name": "Login as Seller",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"email\": \"seller@example.com\",\n\t\"password\": \"password\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1701698200000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request",
+            "afterResponseScript": "const body = JSON.parse(insomnia.response.body);\nif (body.token) {\n  insomnia.environment.set('auth_token', body.token);\n  insomnia.environment.set('seller_token', body.token);\n}"
+        },
+        {
+            "_id": "req_login_client",
+            "parentId": "fld_auth",
+            "modified": 1702026100000,
+            "created": 1702026100000,
+            "url": "{{ base_url }}/api/auth/login",
+            "name": "Login as Client",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"email\": \"client@example.com\",\n\t\"password\": \"password\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1701698150000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request",
+            "afterResponseScript": "const body = JSON.parse(insomnia.response.body);\nif (body.token) {\n  insomnia.environment.set('auth_token', body.token);\n  insomnia.environment.set('client_token', body.token);\n}"
+        },
+        {
+            "_id": "req_login_unauth",
+            "parentId": "fld_auth",
+            "modified": 1702026100000,
+            "created": 1702026100000,
+            "url": "{{ base_url }}/api/auth/login",
+            "name": "Login (Unauthorized)",
+            "description": "Expected result: 401 Unauthorized",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"email\": \"seller@example.com\",\n\t\"password\": \"wrongpassword\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1701698140000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_logout",
+            "parentId": "fld_auth",
+            "modified": 1702026000000,
+            "created": 1702026000000,
+            "url": "{{ base_url }}/api/auth/logout",
+            "name": "Logout",
+            "description": "Note: Backend is stateless JWT, so this might return 404 or just be client-side action.",
+            "method": "POST",
+            "body": {},
+            "parameters": [],
+            "headers": [],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ auth_token }}"
+            },
+            "metaSortKey": -1701698100000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_update_profile",
+            "parentId": "fld_auth",
+            "modified": 1702026000000,
+            "created": 1702026000000,
+            "url": "{{ base_url }}/api/auth/profile",
+            "name": "Update Profile",
+            "description": "",
+            "method": "PUT",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"password\": \"newpassword123\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ auth_token }}"
+            },
+            "metaSortKey": -1701698000000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_get_products",
+            "parentId": "fld_products",
+            "modified": 1702026000000,
+            "created": 1701698400000,
+            "url": "{{ base_url }}/api/products",
+            "name": "Get All Products",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [],
+            "authentication": {},
+            "metaSortKey": -1701698400000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_create_product",
+            "parentId": "fld_products",
+            "modified": 1702026000000,
+            "created": 1701698400000,
+            "url": "{{ base_url }}/api/products",
+            "name": "Create Product",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"name\": \"New Product\",\n\t\"description\": \"Product Description\",\n\t\"price\": 99.99,\n\t\"imageUrls\": []\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ auth_token }}"
+            },
+            "metaSortKey": -1701698300000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request",
+            "afterResponseScript": "const body = JSON.parse(insomnia.response.body);\nif (body.id) {\n  insomnia.environment.set('product_id', body.id);\n}"
+        },
+        {
+            "_id": "req_create_product_client",
+            "parentId": "fld_products",
+            "modified": 1702026100000,
+            "created": 1702026100000,
+            "url": "{{ base_url }}/api/products",
+            "name": "Create Product (Client - Forbidden)",
+            "description": "Expected result: 403 Forbidden",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"name\": \"Illegal Product\",\n\t\"description\": \"Client should not be able to create this\",\n\t\"price\": 0.00,\n\t\"imageUrls\": []\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ client_token }}"
+            },
+            "metaSortKey": -1701698290000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_delete_product",
+            "parentId": "fld_products",
+            "modified": 1702026000000,
+            "created": 1702026000000,
+            "url": "{{ base_url }}/api/products/{{ product_id }}",
+            "name": "Delete Product",
+            "description": "",
+            "method": "DELETE",
+            "body": {},
+            "parameters": [],
+            "headers": [],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ auth_token }}"
+            },
+            "metaSortKey": -1701698200000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_upload_media",
+            "parentId": "fld_media",
+            "modified": 1702026100000,
+            "created": 1701698400000,
+            "url": "{{ base_url }}/api/media/upload",
+            "name": "Upload Media",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "multipart/form-data",
+                "params": [
+                    {
+                        "name": "file",
+                        "type": "file",
+                        "fileName": "/path/to/image.jpg"
+                    }
+                ]
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "multipart/form-data"
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ auth_token }}"
+            },
+            "metaSortKey": -1701698400000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request",
+            "afterResponseScript": "const body = JSON.parse(insomnia.response.body);\nif (body.id) {\n  insomnia.environment.set('media_id', body.id);\n}"
+        },
+        {
+            "_id": "req_get_media",
+            "parentId": "fld_media",
+            "modified": 1702026100000,
+            "created": 1702026100000,
+            "url": "{{ base_url }}/api/media/{{ media_id }}",
+            "name": "Get Media",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [],
+            "authentication": {},
+            "metaSortKey": -1701698300000,
+            "isPrivate": false,
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "env_local",
+            "parentId": "wrk_buy01",
+            "modified": 1702026000000,
+            "created": 1701698400000,
+            "name": "Local",
+            "data": {
+                "base_url": "https://api.local.hello-there.net",
+                "auth_token": "",
+                "seller_token": "",
+                "client_token": "",
+                "product_id": ""
+            },
+            "dataPropertyOrder": {
+                "&": [
+                    "base_url",
+                    "auth_token",
+                    "seller_token",
+                    "client_token",
+                    "product_id"
+                ]
+            },
+            "color": null,
+            "isPrivate": false,
+            "metaSortKey": 1701698400000,
+            "_type": "environment"
+        },
+        {
+            "_id": "wrk_buy01",
+            "parentId": null,
+            "modified": 1701698400000,
+            "created": 1701698400000,
+            "name": "Buy-01 API",
+            "description": "API requests for Buy-01 E-commerce platform",
+            "scope": "collection",
+            "_type": "workspace"
+        },
+        {
+            "_id": "fld_auth",
+            "parentId": "wrk_buy01",
+            "modified": 1701698400000,
+            "created": 1701698400000,
+            "name": "Auth",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1701698400000,
+            "_type": "request_group"
+        },
+        {
+            "_id": "fld_products",
+            "parentId": "wrk_buy01",
+            "modified": 1701698400000,
+            "created": 1701698400000,
+            "name": "Products",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1701698300000,
+            "_type": "request_group"
+        },
+        {
+            "_id": "fld_media",
+            "parentId": "wrk_buy01",
+            "modified": 1701698400000,
+            "created": 1701698400000,
+            "name": "Media",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1701698200000,
+            "_type": "request_group"
+        }
+    ]
+}

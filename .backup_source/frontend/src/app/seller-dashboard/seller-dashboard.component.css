@@ -1,0 +1,81 @@
+:host {
+    /* Design Tokens - Inherit from Global */
+    --spacing-md: 20px;
+}
+
+.dashboard-container {
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.content {
+    display: flex;
+    gap: 20px;
+}
+
+.form-card,
+.list-card {
+    flex: 1;
+}
+
+.full-width {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.file-upload {
+    margin-bottom: 15px;
+}
+
+input[type="file"]::file-selector-button {
+    background-color: var(--accent-color);
+    color: #282828;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    margin-right: 10px;
+    transition: background-color 0.2s;
+}
+
+input[type="file"]::file-selector-button:hover {
+    opacity: 0.9;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.error {
+    color: var(--warn-color);
+    margin-bottom: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 10px;
+        /* Reduced padding */
+    }
+
+    .content {
+        flex-direction: column;
+        gap: 10px;
+        /* Reduced gap */
+    }
+
+    .form-card {
+        margin-bottom: 0;
+    }
+}
