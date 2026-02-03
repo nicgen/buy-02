@@ -1,26 +1,27 @@
 pipeline {
     agent any
+
     environment {
         COMPOSE_FILE = 'docker-compose.yml'
         COMPOSE_PROJECT_NAME = 'mr-jenk'
     }
+
     stages {
-        stage('Checkout') {
+        stage('Test Backend') {
             steps {
-                echo 'Checking out code...'
-                checkout scm
-            }
-        }
-        stage('Build System Check') {
-            steps {
-                sh 'docker compose version'
-                echo 'Build system is ready.'
+                script {
+                    echo 'Testing User Service...'
+                    dir('services/user-service') {
+                        sh 'mvn test'
+                    }
+                }
             }
         }
     }
+
     post {
         success {
-            echo 'Pipeline initialized successfully!'
+            echo 'User Service verified successfully!'
         }
     }
 }
