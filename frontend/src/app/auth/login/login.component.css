@@ -1,0 +1,49 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--bg-color);
+}
+
+mat-card {
+    width: 400px;
+    padding: 20px;
+    max-width: 90%;
+}
+
+@media (max-width: 600px) {
+    .login-container {
+        height: auto;
+        padding: 20px;
+        align-items: flex-start;
+        padding-top: 60px;
+        /* Space from top */
+    }
+
+    mat-card {
+        width: 100%;
+        max-width: none;
+        box-shadow: none !important;
+        /* Optional: flatter look on mobile */
+        border: none !important;
+        background: transparent !important;
+        /* Blend with background */
+    }
+}
+
+.full-width {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.error {
+    color: var(--warn-color);
+    margin-bottom: 10px;
+}
+
+mat-card-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}

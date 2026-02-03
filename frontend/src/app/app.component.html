@@ -1,0 +1,32 @@
+<div class="app-container">
+    <nav class="navbar">
+        <div class="nav-header">
+            <a routerLink="/" class="brand" (click)="closeMenu()">Buy-01</a>
+            <button mat-icon-button class="menu-toggle" (click)="toggleMenu()">
+                <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
+            </button>
+        </div>
+        <div class="nav-links" [class.active]="isMenuOpen">
+            <a routerLink="/products" (click)="closeMenu()">Products</a>
+            <a *ngIf="isLoggedIn" routerLink="/cart" (click)="closeMenu()">Cart ({{ cartCount }})</a>
+            <a *ngIf="isLoggedIn" routerLink="/wishlist" (click)="closeMenu()">Wishlist</a>
+            <a *ngIf="isLoggedIn" routerLink="/orders" (click)="closeMenu()">My Orders</a>
+            <a *ngIf="isLoggedIn" routerLink="/profile" (click)="closeMenu()">Profile</a>
+            <a *ngIf="isSeller" routerLink="/seller-dashboard" (click)="closeMenu()">Seller Dashboard</a>
+            <a *ngIf="!isLoggedIn" routerLink="/auth/login" (click)="closeMenu()">Login</a>
+            <a *ngIf="isLoggedIn" (click)="logout()" style="cursor: pointer;">Logout</a>
+            <!-- Theme Toggle -->
+            <button mat-icon-button (click)="toggleTheme()" class="theme-toggle-desktop">
+                <mat-icon>{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+            </button>
+            <a class="theme-toggle-mobile" (click)="toggleTheme()">
+                <mat-icon style="vertical-align: middle; margin-right: 5px;">{{ isDarkTheme ? 'light_mode' : 'dark_mode'
+                    }}</mat-icon>
+                Switch to {{ isDarkTheme ? 'Light' : 'Dark' }} Mode
+            </a>
+        </div>
+    </nav>
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+</div>
