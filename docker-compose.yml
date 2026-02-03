@@ -1,0 +1,108 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: buy01-mongo
+    ports:
+      - "27017:27017" # Kept for local tools if needed, can be removed if strictly internal
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    container_name: buy01-mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
+    depends_on:
+      - mongodb
+    ports:
+      - "8081:8081"
+
+  user-service:
+    build: ./services/user-service
+    container_name: buy01-user-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+    depends_on:
+      - mongodb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.buy01-users.rule=Host(`api.${DOMAIN_NAME}`) && (PathPrefix(`/api/auth`) || PathPrefix(`/api/wishlist`))"
+      - "traefik.http.routers.buy01-users.entrypoints=websecure"
+      - "traefik.http.routers.buy01-users.tls.certresolver=cloudflare"
+      - "traefik.http.services.buy01-users.loadbalancer.server.port=8081"
+
+  product-service:
+    build: ./services/product-service
+    container_name: buy01-product-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+    depends_on:
+      - mongodb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.buy01-products.rule=Host(`api.${DOMAIN_NAME}`) && PathPrefix(`/api/products`)"
+      - "traefik.http.routers.buy01-products.entrypoints=websecure"
+      - "traefik.http.routers.buy01-products.tls.certresolver=cloudflare"
+      - "traefik.http.services.buy01-products.loadbalancer.server.port=8082"
+
+  media-service:
+    build: ./services/media-service
+    container_name: buy01-media-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+    depends_on:
+      - mongodb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.buy01-media.rule=Host(`api.${DOMAIN_NAME}`) && PathPrefix(`/api/media`)"
+      - "traefik.http.routers.buy01-media.entrypoints=websecure"
+      - "traefik.http.routers.buy01-media.tls.certresolver=cloudflare"
+      - "traefik.http.services.buy01-media.loadbalancer.server.port=8083"
+    volumes:
+      - ./uploads:/app/uploads
+
+  order-service:
+    build: ./services/order-service
+    container_name: buy01-order-service
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://admin:password@mongodb:27017/buy01?authSource=admin
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.buy01-orders.rule=Host(`api.${DOMAIN_NAME}`) && PathPrefix(`/api/orders`)"
+      - "traefik.http.routers.buy01-orders.entrypoints=websecure"
+      - "traefik.http.routers.buy01-orders.tls.certresolver=cloudflare"
+      - "traefik.http.services.buy01-orders.loadbalancer.server.port=8084"
+
+  frontend:
+    build: ./frontend
+    container_name: buy01-frontend
+    depends_on:
+      - user-service
+      - product-service
+      - media-service
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.buy01-frontend.rule=Host(`app.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.buy01-frontend.entrypoints=websecure"
+      - "traefik.http.routers.buy01-frontend.tls.certresolver=cloudflare"
+      - "traefik.http.services.buy01-frontend.loadbalancer.server.port=80"
+
+volumes:
+  mongodb_data:
+
+
+networks:
+  default:
+    name: traefik_net
+    external: true
