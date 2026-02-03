@@ -1,0 +1,33 @@
+services:
+  jenkins:
+    build:
+      context: ./jenkins
+    container_name: jenkins
+    restart: unless-stopped
+    ports:
+      - "8088:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN_NAME}`)"
+      - "traefik.http.routers.jenkins.entrypoints=websecure"
+      - "traefik.http.routers.jenkins.tls.certresolver=cloudflare"
+      - "traefik.http.services.jenkins.loadbalancer.server.port=8080"
+    environment:
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false # Optional: helps automated setup, but strictly we just need the vars above
+    user: root # Needed to access /var/run/docker.sock if permission issues arise, otherwise might need group adjustment
+
+volumes:
+  jenkins_home:
+
+
+networks:
+  traefik_net:
+    external: true
