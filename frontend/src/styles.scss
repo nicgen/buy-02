@@ -1,0 +1,303 @@
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material.
+@include mat.core();
+
+// Define the Gruvbox Dark Palette
+$gruvbox-dark-primary: (
+    50: #fbf1c7,
+    100: #ebdbb2,
+    200: #d5c4a1,
+    300: #bdae93,
+    400: #a89984,
+    500: #fe8019,
+    // Primary Orange
+    600: #d65d0e,
+    700: #af3a03,
+    800: #7c6f64,
+    900: #504945,
+    A100: #fabd2f,
+    A200: #fe8019,
+    A400: #d65d0e,
+    A700: #af3a03,
+    contrast: (500: #282828, // Dark text on Orange
+        A100: #282828,
+        A200: #282828,
+        A400: #ebdbb2,
+        A700: #ebdbb2,
+    )
+);
+
+$gruvbox-dark-accent: (
+    50: #fbf1c7,
+    100: #ebdbb2,
+    200: #d5c4a1,
+    300: #bdae93,
+    400: #a89984,
+    500: #83a598,
+    // Accent Blue
+    600: #458588,
+    700: #076678,
+    800: #7c6f64,
+    900: #504945,
+    A100: #83a598,
+    A200: #458588,
+    A400: #076678,
+    A700: #076678,
+    contrast: (500: #282828,
+        A100: #282828,
+        A200: #ebdbb2,
+        A400: #ebdbb2,
+        A700: #ebdbb2,
+    )
+);
+
+$gruvbox-dark-warn: (
+    50: #fbf1c7,
+    100: #ebdbb2,
+    200: #d5c4a1,
+    300: #bdae93,
+    400: #a89984,
+    500: #fb4934,
+    // Warn Red
+    600: #cc241d,
+    700: #9d0006,
+    800: #7c6f64,
+    900: #504945,
+    A100: #fb4934,
+    A200: #cc241d,
+    A400: #9d0006,
+    A700: #9d0006,
+    contrast: (500: #282828,
+        A100: #282828,
+        A200: #ebdbb2,
+        A400: #ebdbb2,
+        A700: #ebdbb2,
+    )
+);
+
+// Define Gruvbox Light Palette
+$gruvbox-light-primary: (
+    50: #fbf1c7,
+    100: #ebdbb2,
+    200: #d5c4a1,
+    300: #bdae93,
+    400: #a89984,
+    500: #b8bb26,
+    // Green
+    600: #98971a,
+    700: #79740e,
+    800: #3c3836,
+    900: #282828,
+    A100: #fabd2f,
+    A200: #b8bb26,
+    A400: #98971a,
+    A700: #79740e,
+    contrast: (500: #fbf1c7,
+        A100: #3c3836,
+        A200: #fbf1c7,
+        A400: #fbf1c7,
+        A700: #fbf1c7,
+    )
+);
+
+$gruvbox-light-accent: (
+    50: #e0f2f1,
+    100: #b2dfdb,
+    200: #80cbc4,
+    300: #4db6ac,
+    400: #26a69a,
+    500: #458588,
+    // Blue
+    600: #00897b,
+    700: #00796b,
+    800: #00695c,
+    900: #004d40,
+    A100: #a7ffeb,
+    A200: #64ffda,
+    A400: #1de9b6,
+    A700: #00bfa5,
+    contrast: (500: #fbf1c7,
+    )
+);
+
+$gruvbox-light-warn: (
+    50: #ffebee,
+    100: #ffcdd2,
+    200: #ef9a9a,
+    300: #e57373,
+    400: #ef5350,
+    500: #cc241d,
+    // Red
+    600: #e53935,
+    700: #d32f2f,
+    800: #c62828,
+    900: #b71c1c,
+    A100: #ff8a80,
+    A200: #ff5252,
+    A400: #ff1744,
+    A700: #d50000,
+    contrast: (500: #fbf1c7,
+    )
+);
+
+// Define the palettes
+// Define the palettes
+$buy01-dark-primary: mat.define-palette($gruvbox-dark-primary, 500);
+$buy01-dark-accent: mat.define-palette($gruvbox-dark-accent, 500);
+$buy01-dark-warn: mat.define-palette($gruvbox-dark-warn, 500);
+
+$buy01-light-primary: mat.define-palette($gruvbox-light-primary, 500);
+$buy01-light-accent: mat.define-palette($gruvbox-light-accent, 500);
+$buy01-light-warn: mat.define-palette($gruvbox-light-warn, 500);
+
+// Create the theme objects
+$buy01-dark-theme: mat.define-dark-theme((color: (primary: $buy01-dark-primary,
+                accent: $buy01-dark-accent,
+                warn: $buy01-dark-warn,
+            ),
+            typography: mat.define-typography-config(),
+            density: 0));
+
+$buy01-light-theme: mat.define-light-theme((color: (primary: $buy01-light-primary,
+                accent: $buy01-light-accent,
+                warn: $buy01-light-warn,
+            ),
+            typography: mat.define-typography-config(),
+            density: 0));
+
+// Include theme styles
+@include mat.all-component-themes($buy01-dark-theme);
+
+.light-theme {
+    @include mat.all-component-colors($buy01-light-theme);
+}
+
+// Global Styles for Gruvbox Dark
+// Global Styles
+body {
+    // Default (Dark) Variables
+    --card-bg: #32302f;
+    --text-primary: #ebdbb2;
+    --text-secondary: #d5c4a1;
+    --bg-color: #282828;
+    --accent-color: #83a598;
+    --warn-color: #fb4934;
+    --price-color: #b8bb26;
+    --border-color: #504945;
+
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.light-theme {
+    // Light Variables
+    --card-bg: #ffffff;
+    --text-primary: #3c3836;
+    --text-secondary: #504945;
+    --bg-color: #fbf1c7;
+    --accent-color: #458588;
+    --warn-color: #cc241d;
+    --price-color: #427b58;
+    --border-color: #d5c4a1;
+}
+
+// Modernize Angular Material Components
+
+// Cards
+// Cards
+.mat-mdc-card {
+    background-color: var(--card-bg) !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--border-color);
+}
+
+.mat-mdc-card-header {
+    padding: 16px 16px 0 16px;
+}
+
+.mat-mdc-card-title {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+}
+
+// Form Fields
+.mat-mdc-form-field {
+    width: 100%;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background-color: var(--card-bg) !important;
+    border-radius: 8px 8px 0 0;
+}
+
+.mat-mdc-input-element {
+    color: var(--text-primary) !important;
+}
+
+.mat-mdc-form-field-label {
+    color: var(--text-secondary) !important;
+}
+
+// Buttons
+.mat-mdc-raised-button.mat-primary {
+    // Rely on theme mixin
+    border-radius: 8px !important;
+    font-weight: 600;
+    padding: 0 24px !important;
+}
+
+.mat-mdc-raised-button.mat-accent {
+    // Rely on theme mixin
+    border-radius: 8px !important;
+}
+
+// Links
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+// Lists
+.mat-mdc-list-item {
+    color: var(--text-primary) !important;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.1) !important;
+    }
+}
+
+// Dialogs/Overlays
+.cdk-overlay-pane {
+    background-color: var(--card-bg);
+}
+
+// Scrollbars
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+
+    &:hover {
+        background: var(--text-secondary);
+    }
+}

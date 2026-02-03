@@ -1,0 +1,33 @@
+.profile-container {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.profile-section {
+    margin-bottom: 20px;
+}
+
+mat-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+mat-form-field {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.success-message {
+    color: green;
+    margin-bottom: 10px;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+}
