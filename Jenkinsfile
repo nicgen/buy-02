@@ -8,11 +8,26 @@ pipeline {
 
     stages {
         stage('Test Backend') {
-            steps {
-                script {
-                    echo 'Testing User Service...'
-                    dir('services/user-service') {
-                        sh 'mvn test'
+            parallel {
+                stage('User Service') {
+                    steps {
+                        dir('services/user-service') {
+                            sh 'mvn test'
+                        }
+                    }
+                }
+                stage('Product Service') {
+                    steps {
+                        dir('services/product-service') {
+                            sh 'mvn test'
+                        }
+                    }
+                }
+                stage('Media Service') {
+                    steps {
+                        dir('services/media-service') {
+                            sh 'mvn test'
+                        }
                     }
                 }
             }
@@ -21,7 +36,7 @@ pipeline {
 
     post {
         success {
-            echo 'User Service verified successfully!'
+            echo 'Backend services verified successfully!'
         }
     }
 }
