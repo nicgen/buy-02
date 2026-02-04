@@ -50,10 +50,13 @@ public class MediaService {
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
+            // CHANGED: Store only the fileName (relative path) to make it portable.
+            // The getMediaData method will resolve it against the current
+            // fileStorageLocation.
             Media media = new Media(
                     file.getOriginalFilename(),
                     file.getContentType(),
-                    targetLocation.toString(),
+                    fileName,
                     uploaderId);
 
             return mediaRepository.save(media);
@@ -69,7 +72,37 @@ public class MediaService {
 
     public byte[] getMediaData(String id) throws IOException {
         Media media = getMedia(id);
-        Path filePath = Paths.get(media.getFilePath());
+
+        // Robust path resolution:
+        // 1. Try resolving as relative path (standard for new uploads)
+        // 2. If stored as absolute (legacy), check if exists. If not, try to extract
+        // filename and look in current storage.
+
+        Path filePath;
+        String storedPath = media.getFilePath();
+        Path storedPathObj = Paths.get(storedPath);
+
+        if (storedPathObj.isAbsolute()) {
+            if (Files.exists(storedPathObj)) {
+                filePath = storedPathObj;
+            } else {
+                // Fallback: assume it's a legacy absolute path that moved. Extract filename.
+                String filename = storedPathObj.getFileName().toString();
+                filePath = this.fileStorageLocation.resolve(filename);
+            }
+        } else {
+            // It's a relative path (filename)
+            filePath = this.fileStorageLocation.resolve(storedPath);
+        }
+
+        if (!Files.exists(filePath)) {
+            // Final fallback for "repaired" references or lost files -> placeholder if
+            // exists, else error
+            // Ideally we throw error, but for robustness we could log. Sticking to
+            // IOException for now.
+            throw new IOException("File not found at " + filePath);
+        }
+
         return Files.readAllBytes(filePath);
     }
 
