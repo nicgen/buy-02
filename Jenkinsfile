@@ -38,10 +38,16 @@ pipeline {
                 CHROME_BIN = '/usr/bin/google-chrome-stable'
             }
             steps {
-                dir('frontend') {
-                    sh 'npm install'
-                    // Run tests using the local ng installed by npm
-                    sh 'npm run test -- --watch=false --browsers=ChromeHeadlessNoSandbox'
+                script {
+                    if (fileExists('frontend/package.json')) {
+                        dir('frontend') {
+                            sh 'npm install'
+                            // Run tests using the local ng installed by npm
+                            sh 'npm run test -- --watch=false --browsers=ChromeHeadlessNoSandbox'
+                        }
+                    } else {
+                        echo 'Skipping frontend tests: frontend directory not found'
+                    }
                 }
             }
         }
@@ -50,8 +56,14 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool 'SonarQubeScanner'
+                    def sonarParams = ""
+                    if (!fileExists('frontend')) {
+                         echo 'Frontend directory not found. Excluding from SonarQube analysis.'
+                         sonarParams = "-Dsonar.sources=services"
+                    }
+
                     withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        sh "${scannerHome}/bin/sonar-scanner ${sonarParams}"
                     }
                     timeout(time: 1, unit: 'HOURS') {
                         waitForQualityGate abortPipeline: true
