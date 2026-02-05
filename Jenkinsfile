@@ -66,7 +66,7 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner ${sonarParams}"
                     }
                     timeout(time: 1, unit: 'HOURS') {
-                        waitForQualityGate abortPipeline: false
+                        waitForQualityGate abortPipeline: true
                     }
                 }
             }
