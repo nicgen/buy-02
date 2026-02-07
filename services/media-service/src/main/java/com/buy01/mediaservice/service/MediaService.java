@@ -28,7 +28,8 @@ public class MediaService {
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
-            throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
+            throw new java.io.UncheckedIOException(
+                    "Could not create the directory where the uploaded files will be stored.", new IOException(ex));
         }
     }
 
