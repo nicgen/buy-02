@@ -74,15 +74,16 @@ public class UserService {
     public com.buy01.userservice.dto.UserProfileResponse getProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
-        return new com.buy01.userservice.dto.UserProfileResponse(
-                user.getId(),
-                user.getEmail(),
-                user.getRole(),
-                user.getStreet(),
-                user.getCity(),
-                user.getZip(),
-                user.getCountry(),
-                user.getPhoneNumber());
+        return com.buy01.userservice.dto.UserProfileResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .street(user.getStreet())
+                .city(user.getCity())
+                .zip(user.getZip())
+                .country(user.getCountry())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
     }
 
     public void toggleWishlist(String userId, String productId) {

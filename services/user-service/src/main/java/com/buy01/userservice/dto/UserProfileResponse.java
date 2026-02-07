@@ -13,7 +13,7 @@ public class UserProfileResponse {
     public UserProfileResponse() {
     }
 
-    public UserProfileResponse(String id, String email, String role, String street, String city, String zip,
+    private UserProfileResponse(String id, String email, String role, String street, String city, String zip,
             String country, String phoneNumber) {
         this.id = id;
         this.email = email;
@@ -23,6 +23,66 @@ public class UserProfileResponse {
         this.zip = zip;
         this.country = country;
         this.phoneNumber = phoneNumber;
+    }
+
+    // Builder Pattern
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String id;
+        private String email;
+        private String role;
+        private String street;
+        private String city;
+        private String zip;
+        private String country;
+        private String phoneNumber;
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder role(String role) {
+            this.role = role;
+            return this;
+        }
+
+        public Builder street(String street) {
+            this.street = street;
+            return this;
+        }
+
+        public Builder city(String city) {
+            this.city = city;
+            return this;
+        }
+
+        public Builder zip(String zip) {
+            this.zip = zip;
+            return this;
+        }
+
+        public Builder country(String country) {
+            this.country = country;
+            return this;
+        }
+
+        public Builder phoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        public UserProfileResponse build() {
+            return new UserProfileResponse(id, email, role, street, city, zip, country, phoneNumber);
+        }
     }
 
     public String getId() {

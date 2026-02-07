@@ -40,6 +40,7 @@ class UserServiceTest {
     private User testUser;
 
     private static final String EMAIL = "test@example.com";
+    private static final String PASSWORD = "password";
     private static final String ENCODED_PASSWORD = "encodedPassword";
     private static final String MOCK_TOKEN = "mockToken";
     private static final String PRODUCT_ID = "prod1";
@@ -59,7 +60,7 @@ class UserServiceTest {
     void registerShouldCreateUserAndReturnToken() {
         AuthRequest request = new AuthRequest();
         request.setEmail(EMAIL);
-        request.setPassword("password");
+        request.setPassword(PASSWORD);
         request.setRole("CLIENT");
 
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
@@ -78,10 +79,10 @@ class UserServiceTest {
     void loginShouldReturnTokenWhenCredentialsValid() {
         AuthRequest request = new AuthRequest();
         request.setEmail(EMAIL);
-        request.setPassword("password");
+        request.setPassword(PASSWORD);
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("password", ENCODED_PASSWORD)).thenReturn(true);
+        when(passwordEncoder.matches(PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
         when(jwtUtil.generateToken(testUser.getEmail(), testUser.getRole(), testUser.getId())).thenReturn(MOCK_TOKEN);
 
         AuthResponse response = userService.login(request);
