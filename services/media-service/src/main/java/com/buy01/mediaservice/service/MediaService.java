@@ -36,14 +36,40 @@ public class MediaService {
     }
 
     public Media uploadMedia(MultipartFile file, String uploaderId) throws IOException {
-        if (file.getSize() > 2 * 1024 * 1024) {
-            throw new IOException("File size exceeds the limit of 2MB");
+        logger.info("Starting uploadMedia: filename={}, size={}, contentType={}",
+                file.getOriginalFilename(), file.getSize(), file.getContentType());
+
+        if (file.getSize() > 10 * 1024 * 1024) {
+            logger.error("File size exceeded: {} bytes", file.getSize());
+            throw new IOException("File size exceeds the limit of 10MB");
         }
-        if (!file.getContentType().startsWith("image/")) {
+
+        String originalFilename = file.getOriginalFilename();
+        String contentType = file.getContentType();
+        boolean isValidImage = false;
+
+        // 1. Check Content-Type header
+        if (contentType != null && contentType.startsWith("image/")) {
+            isValidImage = true;
+        }
+
+        // 2. Fallback: check extension if Content-Type is missing or generic
+        if (!isValidImage && originalFilename != null) {
+            String lowerName = originalFilename.toLowerCase();
+            if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
+                    lowerName.endsWith(".png") || lowerName.endsWith(".gif") ||
+                    lowerName.endsWith(".webp") || lowerName.endsWith(".bmp")) {
+                logger.info("Validating by extension for filename: {}", originalFilename);
+                isValidImage = true;
+            }
+        }
+
+        if (!isValidImage) {
+            logger.error("Invalid file type: contentType={}, filename={}", contentType, originalFilename);
             throw new IOException("Only image files are allowed");
         }
 
-        String fileName = UUID.randomUUID().toString() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = UUID.randomUUID().toString() + "_" + StringUtils.cleanPath(originalFilename);
 
         try {
             if (fileName.contains("..")) {
@@ -52,13 +78,14 @@ public class MediaService {
 
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            logger.info("File stored successfully at: {}", targetLocation);
 
             // CHANGED: Store only the fileName (relative path) to make it portable.
             // The getMediaData method will resolve it against the current
             // fileStorageLocation.
             Media media = new Media(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
+                    originalFilename,
+                    contentType,
                     fileName,
                     uploaderId);
 

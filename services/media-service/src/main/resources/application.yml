@@ -9,8 +9,8 @@ spring:
       uri: mongodb://admin:password@localhost:27017/buy01_media?authSource=admin
   servlet:
     multipart:
-      max-file-size: 2MB
-      max-request-size: 2MB
+      max-file-size: 10MB
+      max-request-size: 10MB
   server:
     forward-headers-strategy: framework
 

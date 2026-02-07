@@ -67,6 +67,7 @@ services:
       - "traefik.http.services.buy01-media.loadbalancer.server.port=8083"
     volumes:
       - ./uploads:/app/uploads
+    user: "${UID:-1000}:${GID:-1000}"
 
   order-service:
     build: ./services/order-service
