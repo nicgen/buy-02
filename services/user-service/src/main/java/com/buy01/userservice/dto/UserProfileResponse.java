@@ -13,6 +13,7 @@ public class UserProfileResponse {
     public UserProfileResponse() {
     }
 
+    @SuppressWarnings("java:S107")
     private UserProfileResponse(String id, String email, String role, String street, String city, String zip,
             String country, String phoneNumber) {
         this.id = id;
