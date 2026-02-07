@@ -39,83 +39,89 @@ class UserServiceTest {
 
     private User testUser;
 
+    private static final String EMAIL = "test@example.com";
+    private static final String ENCODED_PASSWORD = "encodedPassword";
+    private static final String MOCK_TOKEN = "mockToken";
+    private static final String PRODUCT_ID = "prod1";
+    private static final String USER_ID = "1";
+
     @BeforeEach
     void setUp() {
         testUser = new User();
-        testUser.setId("1");
-        testUser.setEmail("test@example.com");
-        testUser.setPassword("encodedPassword");
+        testUser.setId(USER_ID);
+        testUser.setEmail(EMAIL);
+        testUser.setPassword(ENCODED_PASSWORD);
         testUser.setRole("CLIENT");
         testUser.setWishlist(new ArrayList<>());
     }
 
     @Test
-    void register_shouldCreateUserAndReturnToken() {
+    void registerShouldCreateUserAndReturnToken() {
         AuthRequest request = new AuthRequest();
-        request.setEmail("test@example.com");
+        request.setEmail(EMAIL);
         request.setPassword("password");
         request.setRole("CLIENT");
 
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
+        when(passwordEncoder.encode(request.getPassword())).thenReturn(ENCODED_PASSWORD);
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(jwtUtil.generateToken(anyString(), anyString(), anyString())).thenReturn("mockToken");
+        when(jwtUtil.generateToken(anyString(), anyString(), anyString())).thenReturn(MOCK_TOKEN);
 
         AuthResponse response = userService.register(request);
 
         assertNotNull(response);
-        assertEquals("mockToken", response.getToken());
+        assertEquals(MOCK_TOKEN, response.getToken());
         verify(userRepository).save(any(User.class));
     }
 
     @Test
-    void login_shouldReturnToken_whenCredentialsValid() {
+    void loginShouldReturnTokenWhenCredentialsValid() {
         AuthRequest request = new AuthRequest();
-        request.setEmail("test@example.com");
+        request.setEmail(EMAIL);
         request.setPassword("password");
 
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
-        when(jwtUtil.generateToken(testUser.getEmail(), testUser.getRole(), testUser.getId())).thenReturn("mockToken");
+        when(passwordEncoder.matches("password", ENCODED_PASSWORD)).thenReturn(true);
+        when(jwtUtil.generateToken(testUser.getEmail(), testUser.getRole(), testUser.getId())).thenReturn(MOCK_TOKEN);
 
         AuthResponse response = userService.login(request);
 
         assertNotNull(response);
-        assertEquals("mockToken", response.getToken());
+        assertEquals(MOCK_TOKEN, response.getToken());
     }
 
     @Test
-    void updateUser_shouldUpdateAvailableFields() {
+    void updateUserShouldUpdateAvailableFields() {
         UpdateUserRequest updateRequest = new UpdateUserRequest();
         updateRequest.setCity("New City");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(testUser));
 
-        userService.updateUser("test@example.com", updateRequest);
+        userService.updateUser(EMAIL, updateRequest);
 
         assertEquals("New City", testUser.getCity());
         verify(userRepository).save(testUser);
     }
 
     @Test
-    void toggleWishlist_shouldAddId_whenNotPresent() {
+    void toggleWishlistShouldAddIdWhenNotPresent() {
         testUser.setWishlist(new ArrayList<>());
-        when(userRepository.findById("1")).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
 
-        userService.toggleWishlist("1", "prod1");
+        userService.toggleWishlist(USER_ID, PRODUCT_ID);
 
-        assertTrue(testUser.getWishlist().contains("prod1"));
+        assertTrue(testUser.getWishlist().contains(PRODUCT_ID));
         verify(userRepository).save(testUser);
     }
 
     @Test
-    void toggleWishlist_shouldRemoveId_whenPresent() {
+    void toggleWishlistShouldRemoveIdWhenPresent() {
         testUser.setWishlist(new ArrayList<>());
-        testUser.getWishlist().add("prod1");
-        when(userRepository.findById("1")).thenReturn(Optional.of(testUser));
+        testUser.getWishlist().add(PRODUCT_ID);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
 
-        userService.toggleWishlist("1", "prod1");
+        userService.toggleWishlist(USER_ID, PRODUCT_ID);
 
-        assertFalse(testUser.getWishlist().contains("prod1"));
+        assertFalse(testUser.getWishlist().contains(PRODUCT_ID));
         verify(userRepository).save(testUser);
     }
 }

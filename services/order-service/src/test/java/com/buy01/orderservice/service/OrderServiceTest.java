@@ -36,22 +36,26 @@ class OrderServiceTest {
     private Map<String, PaymentStrategy> paymentStrategies;
     private Order testOrder;
 
+    private static final String MOCK_PAYMENT = "MOCK_PAYMENT";
+    private static final String USER_ID = "user1";
+    private static final String SELLER_ID = "seller1";
+
     @BeforeEach
     void setUp() {
         paymentStrategies = new HashMap<>();
-        paymentStrategies.put("MOCK_PAYMENT", mockPaymentStrategy);
+        paymentStrategies.put(MOCK_PAYMENT, mockPaymentStrategy);
         orderService = new OrderService(orderRepository, paymentStrategies);
 
         testOrder = new Order();
         testOrder.setId("1");
-        testOrder.setUserId("user1");
+        testOrder.setUserId(USER_ID);
         testOrder.setTotalAmount(BigDecimal.valueOf(100.00));
-        testOrder.setPaymentMethod("MOCK_PAYMENT");
+        testOrder.setPaymentMethod(MOCK_PAYMENT);
         testOrder.setStatus(OrderStatus.PENDING);
     }
 
     @Test
-    void createOrder_shouldUseCorrectStrategyAndSave() {
+    void createOrderShouldUseCorrectStrategyAndSave() {
         // Setup mock strategy behavior
         Map<String, String> paymentDetails = new HashMap<>();
         paymentDetails.put("transactionId", "txn_123");
@@ -69,7 +73,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void getUserStats_shouldCalculateCorrectly() {
+    void getUserStatsShouldCalculateCorrectly() {
         Order order1 = new Order();
         order1.setTotalAmount(BigDecimal.valueOf(50.00));
         order1.setStatus(OrderStatus.DELIVERED);
@@ -79,9 +83,9 @@ class OrderServiceTest {
         order2.setStatus(OrderStatus.PENDING);
 
         List<Order> orders = List.of(order1, order2);
-        when(orderRepository.findByUserId("user1")).thenReturn(orders);
+        when(orderRepository.findByUserId(USER_ID)).thenReturn(orders);
 
-        Map<String, Object> stats = orderService.getUserStats("user1");
+        Map<String, Object> stats = orderService.getUserStats(USER_ID);
 
         assertEquals(BigDecimal.valueOf(100.00), stats.get("totalSpent"));
         assertEquals(1L, stats.get("completedOrders"));
@@ -89,10 +93,10 @@ class OrderServiceTest {
     }
 
     @Test
-    void getSellerStats_shouldCalculateSalesForSellerOnly() {
+    void getSellerStatsShouldCalculateSalesForSellerOnly() {
         // Order with an item from seller1
         OrderItem item1 = new OrderItem();
-        item1.setSellerId("seller1");
+        item1.setSellerId(SELLER_ID);
         item1.setPrice(BigDecimal.valueOf(10.00));
         item1.setQuantity(2); // Total 20.00
 
@@ -108,7 +112,7 @@ class OrderServiceTest {
 
         when(orderRepository.findAll()).thenReturn(Collections.singletonList(order));
 
-        Map<String, Object> stats = orderService.getSellerStats("seller1");
+        Map<String, Object> stats = orderService.getSellerStats(SELLER_ID);
 
         assertEquals(BigDecimal.valueOf(20.00), stats.get("totalSales"));
         assertEquals(2, stats.get("totalItemsSold"));

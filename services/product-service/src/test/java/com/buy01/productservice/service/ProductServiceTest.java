@@ -27,36 +27,39 @@ class ProductServiceTest {
 
     private Product testProduct;
 
+    private static final String PRODUCT_ID = "prod1";
+    private static final String SELLER_ID = "seller1";
+
     @BeforeEach
     void setUp() {
         testProduct = new Product();
-        testProduct.setId("prod1");
+        testProduct.setId(PRODUCT_ID);
         testProduct.setName("Test Product");
         testProduct.setPrice(100.00);
-        testProduct.setSellerId("seller1");
+        testProduct.setSellerId(SELLER_ID);
     }
 
     @Test
-    void createProduct_shouldSetSellerIdAndSave() {
+    void createProductShouldSetSellerIdAndSave() {
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
 
-        Product result = productService.createProduct(testProduct, "seller1");
+        Product result = productService.createProduct(testProduct, SELLER_ID);
 
         assertNotNull(result);
-        assertEquals("seller1", result.getSellerId());
+        assertEquals(SELLER_ID, result.getSellerId());
         verify(productRepository).save(any(Product.class));
     }
 
     @Test
-    void updateProduct_shouldUpdate_whenSellerIsOwner() {
-        when(productRepository.findById("prod1")).thenReturn(Optional.of(testProduct));
+    void updateProductShouldUpdateWhenSellerIsOwner() {
+        when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(testProduct));
         when(productRepository.save(any(Product.class))).thenReturn(testProduct);
 
         Product updateRequest = new Product();
         updateRequest.setName("Updated Name");
         updateRequest.setPrice(150.00);
 
-        Product result = productService.updateProduct("prod1", updateRequest, "seller1");
+        Product result = productService.updateProduct(PRODUCT_ID, updateRequest, SELLER_ID);
 
         assertEquals("Updated Name", result.getName());
         assertEquals(150.00, result.getPrice());
@@ -64,34 +67,34 @@ class ProductServiceTest {
     }
 
     @Test
-    void updateProduct_shouldThrowException_whenSellerIsNotOwner() {
-        when(productRepository.findById("prod1")).thenReturn(Optional.of(testProduct));
+    void updateProductShouldThrowExceptionWhenSellerIsNotOwner() {
+        when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(testProduct));
 
         Product updateRequest = new Product();
         updateRequest.setName("Hacked Name");
 
         assertThrows(RuntimeException.class, () -> {
-            productService.updateProduct("prod1", updateRequest, "hacker");
+            productService.updateProduct(PRODUCT_ID, updateRequest, "hacker");
         });
 
         verify(productRepository, never()).save(any(Product.class));
     }
 
     @Test
-    void deleteProduct_shouldDelete_whenSellerIsOwner() {
-        when(productRepository.findById("prod1")).thenReturn(Optional.of(testProduct));
+    void deleteProductShouldDeleteWhenSellerIsOwner() {
+        when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(testProduct));
 
-        productService.deleteProduct("prod1", "seller1");
+        productService.deleteProduct(PRODUCT_ID, SELLER_ID);
 
-        verify(productRepository).deleteById("prod1");
+        verify(productRepository).deleteById(PRODUCT_ID);
     }
 
     @Test
-    void deleteProduct_shouldThrowException_whenSellerIsNotOwner() {
-        when(productRepository.findById("prod1")).thenReturn(Optional.of(testProduct));
+    void deleteProductShouldThrowExceptionWhenSellerIsNotOwner() {
+        when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(testProduct));
 
         assertThrows(RuntimeException.class, () -> {
-            productService.deleteProduct("prod1", "hacker");
+            productService.deleteProduct(PRODUCT_ID, "hacker");
         });
 
         verify(productRepository, never()).deleteById(anyString());
