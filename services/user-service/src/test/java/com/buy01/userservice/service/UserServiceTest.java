@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,6 +45,7 @@ class UserServiceTest {
     private static final String ENCODED_PASSWORD = "encodedPassword";
     private static final String MOCK_TOKEN = "mockToken";
     private static final String USER_ID = "1";
+    private static final String PRODUCT_ID = "prod1";
 
     private static final String CLIENT_ROLE = "CLIENT";
     private static final String NEW_CITY = "New City";
@@ -77,7 +79,21 @@ class UserServiceTest {
         verify(userRepository).save(any(User.class));
     }
 
-    // ... (skipping some methods unchanged) ...
+    @Test
+    void loginShouldReturnTokenWhenCredentialsValid() {
+        AuthRequest request = new AuthRequest();
+        request.setEmail(EMAIL);
+        request.setPassword(PASSWORD);
+
+        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches(PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
+        when(jwtUtil.generateToken(testUser.getEmail(), testUser.getRole(), testUser.getId())).thenReturn(MOCK_TOKEN);
+
+        AuthResponse response = userService.login(request);
+
+        assertNotNull(response);
+        assertEquals(MOCK_TOKEN, response.getToken());
+    }
 
     @Test
     void updateUserShouldUpdateAvailableFields() {
@@ -88,6 +104,29 @@ class UserServiceTest {
         userService.updateUser(EMAIL, updateRequest);
 
         assertEquals(NEW_CITY, testUser.getCity());
+        verify(userRepository).save(testUser);
+    }
+
+    @Test
+    void toggleWishlistShouldAddIdWhenNotPresent() {
+        testUser.setWishlist(new ArrayList<>());
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
+
+        userService.toggleWishlist(USER_ID, PRODUCT_ID);
+
+        assertTrue(testUser.getWishlist().contains(PRODUCT_ID));
+        verify(userRepository).save(testUser);
+    }
+
+    @Test
+    void toggleWishlistShouldRemoveIdWhenPresent() {
+        testUser.setWishlist(new ArrayList<>());
+        testUser.getWishlist().add(PRODUCT_ID);
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
+
+        userService.toggleWishlist(USER_ID, PRODUCT_ID);
+
+        assertFalse(testUser.getWishlist().contains(PRODUCT_ID));
         verify(userRepository).save(testUser);
     }
 
@@ -121,7 +160,19 @@ class UserServiceTest {
         assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> userService.getProfile(EMAIL));
     }
 
-    // ...
+    @Test
+    void getWishlistShouldReturnUserWishlist() {
+        testUser.setWishlist(new ArrayList<>());
+        testUser.getWishlist().add(PRODUCT_ID);
+
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
+
+        List<String> wishlist = userService.getWishlist(USER_ID);
+
+        assertNotNull(wishlist);
+        assertEquals(1, wishlist.size());
+        assertEquals(PRODUCT_ID, wishlist.get(0));
+    }
 
     @Test
     void getWishlistShouldThrowExceptionWhenUserNotFound() {
