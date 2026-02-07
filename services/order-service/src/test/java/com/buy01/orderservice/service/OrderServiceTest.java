@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -114,5 +115,46 @@ class OrderServiceTest {
 
         assertEquals(BigDecimal.valueOf(20.00), stats.get("totalSales"));
         assertEquals(2, stats.get("totalItemsSold"));
+    }
+
+    @Test
+    void getOrdersByUserIdShouldReturnOrders() {
+        when(orderRepository.findByUserId(USER_ID)).thenReturn(Collections.singletonList(testOrder));
+
+        List<Order> result = orderService.getOrdersByUserId(USER_ID);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(USER_ID, result.get(0).getUserId());
+    }
+
+    @Test
+    void getAllOrdersShouldReturnAllOrders() {
+        when(orderRepository.findAll()).thenReturn(Collections.singletonList(testOrder));
+
+        List<Order> result = orderService.getAllOrders();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void updateOrderStatusShouldUpdateAndSave() {
+        when(orderRepository.findById("1")).thenReturn(Optional.of(testOrder));
+        when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+
+        Order result = orderService.updateOrderStatus("1", OrderStatus.DELIVERED);
+
+        assertEquals(OrderStatus.DELIVERED, result.getStatus());
+        verify(orderRepository).save(testOrder);
+    }
+
+    @Test
+    void updateOrderStatusShouldThrowExceptionWhenOrderNotFound() {
+        when(orderRepository.findById("999")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> {
+            orderService.updateOrderStatus("999", OrderStatus.DELIVERED);
+        });
     }
 }

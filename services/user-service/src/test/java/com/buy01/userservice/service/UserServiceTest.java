@@ -125,4 +125,93 @@ class UserServiceTest {
         assertFalse(testUser.getWishlist().contains(PRODUCT_ID));
         verify(userRepository).save(testUser);
     }
+
+    @Test
+    void getProfileShouldReturnUserProfile() {
+        testUser.setStreet("123 Main St");
+        testUser.setCity("Metropolis");
+        testUser.setZip("12345");
+        testUser.setCountry("USA");
+        testUser.setPhoneNumber("555-1234");
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(testUser));
+
+        com.buy01.userservice.dto.UserProfileResponse response = userService.getProfile(EMAIL);
+
+        assertNotNull(response);
+        assertEquals(USER_ID, response.getId());
+        assertEquals(EMAIL, response.getEmail());
+        assertEquals("CLIENT", response.getRole());
+        assertEquals("123 Main St", response.getStreet());
+        assertEquals("Metropolis", response.getCity());
+        assertEquals("12345", response.getZip());
+        assertEquals("USA", response.getCountry());
+        assertEquals("555-1234", response.getPhoneNumber());
+    }
+
+    @Test
+    void getProfileShouldThrowExceptionWhenUserNotFound() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
+            userService.getProfile(EMAIL);
+        });
+    }
+
+    @Test
+    void getWishlistShouldReturnUserWishlist() {
+        testUser.setWishlist(new ArrayList<>());
+        testUser.getWishlist().add(PRODUCT_ID);
+
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
+
+        java.util.List<String> wishlist = userService.getWishlist(USER_ID);
+
+        assertNotNull(wishlist);
+        assertEquals(1, wishlist.size());
+        assertEquals(PRODUCT_ID, wishlist.get(0));
+    }
+
+    @Test
+    void getWishlistShouldThrowExceptionWhenUserNotFound() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
+            userService.getWishlist(USER_ID);
+        });
+    }
+
+    @Test
+    void updateUserShouldUpdateAllFields() {
+        UpdateUserRequest updateRequest = new UpdateUserRequest();
+        updateRequest.setPassword("newPass");
+        updateRequest.setStreet("New Street");
+        updateRequest.setCity("New City");
+        updateRequest.setZip("54321");
+        updateRequest.setCountry("Canada");
+        updateRequest.setPhoneNumber("555-9876");
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.encode("newPass")).thenReturn("encodedNewPass");
+
+        userService.updateUser(EMAIL, updateRequest);
+
+        assertEquals("encodedNewPass", testUser.getPassword());
+        assertEquals("New Street", testUser.getStreet());
+        assertEquals("New City", testUser.getCity());
+        assertEquals("54321", testUser.getZip());
+        assertEquals("Canada", testUser.getCountry());
+        assertEquals("555-9876", testUser.getPhoneNumber());
+        verify(userRepository).save(testUser);
+    }
+
+    @Test
+    void updateUserShouldThrowExceptionWhenUserNotFound() {
+        UpdateUserRequest updateRequest = new UpdateUserRequest();
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
+            userService.updateUser(EMAIL, updateRequest);
+        });
+    }
 }
