@@ -29,9 +29,9 @@ public class UserService {
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
                 request.getRole());
-        userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getId());
-        return new AuthResponse(token, user.getRole(), user.getEmail());
+        User savedUser = userRepository.save(user);
+        String token = jwtUtil.generateToken(savedUser.getEmail(), savedUser.getRole(), savedUser.getId());
+        return new AuthResponse(token, savedUser.getRole(), savedUser.getEmail());
     }
 
     public AuthResponse login(AuthRequest request) {

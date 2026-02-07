@@ -2,7 +2,6 @@ package com.buy01.userservice.service;
 
 import com.buy01.userservice.dto.AuthRequest;
 import com.buy01.userservice.dto.AuthResponse;
-import com.buy01.userservice.dto.Role;
 import com.buy01.userservice.dto.UpdateUserRequest;
 import com.buy01.userservice.model.User;
 import com.buy01.userservice.repository.UserRepository;
@@ -20,6 +19,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,17 +41,25 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = new User("test@example.com", "encodedPassword", Role.CLIENT);
+        testUser = new User();
         testUser.setId("1");
+        testUser.setEmail("test@example.com");
+        testUser.setPassword("encodedPassword");
+        testUser.setRole("CLIENT");
+        testUser.setWishlist(new ArrayList<>());
     }
 
     @Test
     void register_shouldCreateUserAndReturnToken() {
-        AuthRequest request = new AuthRequest("test@example.com", "password", Role.CLIENT);
+        AuthRequest request = new AuthRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("password");
+        request.setRole("CLIENT");
+
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(jwtUtil.generateToken(anyString(), any(Role.class), any())).thenReturn("mockToken");
+        when(jwtUtil.generateToken(anyString(), anyString(), anyString())).thenReturn("mockToken");
 
         AuthResponse response = userService.register(request);
 
@@ -62,7 +70,10 @@ class UserServiceTest {
 
     @Test
     void login_shouldReturnToken_whenCredentialsValid() {
-        AuthRequest request = new AuthRequest("test@example.com", "password", null);
+        AuthRequest request = new AuthRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("password");
+
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
         when(jwtUtil.generateToken(testUser.getEmail(), testUser.getRole(), testUser.getId())).thenReturn("mockToken");
