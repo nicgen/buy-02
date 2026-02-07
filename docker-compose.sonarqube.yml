@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     networks:
       - traefik_net
+    ports:
+      - "9000:9000"
     environment:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
       - SONAR_FORCEAUTHENTICATION=true

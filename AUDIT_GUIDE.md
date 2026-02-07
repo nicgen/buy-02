@@ -1,82 +1,79 @@
 # Audit Guide - Buy-02
 
-This guide maps the Audit Questions to specific verification steps and the relevant source code files that demonstrate the implementation.
+This guide is designed to assist in auditing the technical architecture, code quality, and functional completeness of the `buy-02` project.
 
-## 1. Functional - Database & Relations
-**Q: Has the database design been correctly implemented? Have relationships been used correctly?**
+## 1. Technical Architecture & Code Explanation
 
-*   **Verification**:
-    1.  Access Mongo Express: `http://localhost:8081`.
-    2.  Check `buy01` database.
-    3.  Verify `orders` have `userId` (relation to User) and `items` (embedded Product snapshot).
-    4.  Verify `users` have `wishlist` (array of Product IDs).
+### Database Evolution (Relation Analysis)
+**Context**: Moving from `buy-01` (Monolith) to `buy-02` (Microservices).
 
-*   **Relevant Files**:
-    *   **Order Entity**: `services/order-service/src/main/java/com/buy01/orderservice/model/Order.java`
-        *   *Shows `userId` and `List<OrderItem>`.*
-    *   **User Entity**: `services/user-service/src/main/java/com/buy01/userservice/model/User.java`
-        *   *Shows `List<String> wishlist`.*
-    *   **Product Entity**: `services/product-service/src/main/java/com/buy01/productservice/model/Product.java`
+*   **Decoupled Relations (NoSQL Style)**:
+    *   **Old Way**: Strict Foreign Keys (e.g., `FOREIGN KEY (user_id) REFERENCES users(id)`).
+    *   **New Way**: **ID References**. Services are independent. The `Order` service does not "know" the `User` table exists; it only stores the `userId` string.
+    *   **Verifiable in Code**: `com.buy01.orderservice.model.Order` -> `private String userId;`.
 
-## 2. Functional - Orders & Shopping Cart
-**Q: Verify Cart persistence and Order creation. Are functionalities consistent?**
+*   **The Snapshot Pattern (Data Duplication)**:
+    *   **Old Way**: JOINing `OrderItems` with `Products` to get the price/name. Risk: If product price changes, old order history changes.
+    *   **New Way**: **Snapshotting**. When an order is created, we copy the *current* `name` and `price` into the `OrderItem`.
+    *   **Verifiable in Code**: `com.buy01.orderservice.model.OrderItem` contains `name` and `price` fields, duplicating data from Product to ensure historical accuracy.
 
-*   **Verification**:
-    1.  **Cart Persistence**: Add item -> Refresh Page -> Item should remain (LocalStorage).
-    2.  **Order Creation**: Click "Checkout" -> Verify redirection -> Check "My Orders" for new PENDING order.
+*   **Simplified Many-to-Many (Wishlist)**:
+    *   **Old Way**: A join table `user_wishlist` mapping `user_id` <-> `product_id`.
+    *   **New Way**: **Embedded Arrays**. The `User` document contains a `List<String> wishlist`.
+    *   **Verifiable in Code**: `com.buy01.userservice.model.User` -> `private List<String> wishlist;`.
 
-*   **Relevant Files**:
-    *   **Cart Logic**: `frontend/src/app/cart/cart.component.ts`
-        *   *Handles LocalStorage persistence and checkout trigger.*
-    *   **Order Processing**: `services/order-service/src/main/java/com/buy01/orderservice/service/OrderService.java`
-        *   *`createOrder` method handles ID generation and strategy selection.*
-    *   **Payment Strategy**: `services/order-service/src/main/java/com/buy01/orderservice/service/payment/StripeStrategy.java`
-        *   *Shows Stripe integration logic.*
+### Design Patterns Implemented
+*   **Strategy Pattern (Payments)**:
+    *   Used to switch between payment methods (`Stripe`, `PayOnDelivery`) without changing core logic.
+    *   **Code**: `com.buy01.orderservice.service.payment.PaymentStrategy` interface.
+*   **Controller-Service-Repository**:
+    *   Standard Spring Boot layered architecture to separate concerns.
 
-## 3. Functional - Search & Filtering
-**Q: Search and filtering functionalities?**
+---
 
-*   **Verification**:
-    1.  Go to Products page.
-    2.  Search for "Phone" -> List updates.
-    3.  Filter by Price (Min/Max) -> List updates.
+## 2. Functional Audit Steps
 
-*   **Relevant Files**:
-    *   **Frontend**: `frontend/src/app/product-list/product-list.component.ts`
-    *   **Backend Controller**: `services/product-service/src/main/java/com/buy01/productservice/controller/ProductController.java`
-        *   *`searchProducts` and `filterProducts` endpoints.*
+### Database Persistence
+*   **Action**: Access Mongo Express (`http://localhost:8081`).
+*   **Verify**:
+    1.  **Separation**: Although all services share the `buy01` DB container, `orders` and `users` are in distinct collections.
+    2.  **Relations**: Check an Order document. It should have a `userId` (String) matching a document in the `users` collection.
 
-## 4. Functional - Security
-**Q: Verify Role-Based Access and consistency.**
+### Orders & Shopping Cart
+*   **Action**: Add items to cart, refresh page, verify persistence. Place an order.
+*   **Verify**:
+    1.  **Frontend**: `LocalStorage` is used for cart persistence (`cart.component.ts`).
+    2.  **Backend**: `OrderService.createOrder` receives the cart items and generates the `OrderItem` snapshots.
 
-*   **Verification**:
-    1.  Login as **Client**. Try to access `http://app.local.hello-there.net/seller-dashboard`.
-    2.  Expect redirect to Products or Login (Access Denied).
+### User Profile & Wishlist
+*   **Action**: Update user address. Toggle wishlist on a product.
+*   **Verify**:
+    1.  **User**: `UpdateUserRequest` DTO handles profile updates.
+    2.  **Wishlist**: Clicking the heart icon adds the Product ID to the `users` collection's `wishlist` array.
 
-*   **Relevant Files**:
-    *   **User Security**: `services/user-service/src/main/java/com/buy01/userservice/config/SecurityConfig.java`
-    *   **Order Security**: `services/order-service/src/main/java/com/buy01/orderservice/config/SecurityConfig.java`
-    *   **JWT Filter**: `services/order-service/src/main/java/com/buy01/orderservice/security/JwtAuthenticationFilter.java`
-        *   *Shows how tokens are parsed and Roles extracted.*
+### Search & Filtering
+*   **Action**: Search for "RAM" or filter by price.
+*   **Verify**:
+    1.  **ProductService**: `ProductRepository` uses `MongoTemplate` or query methods to filter results.
 
-## 5. Collaboration & Process
-**Q: CI/CD Pipeline, Code Reviews, Quality.**
+---
 
-*   **Verification**:
-    1.  **Jenkins**: `http://jenkins.local.hello-there.net` -> Check `buy-02` pipeline history.
-    2.  **SonarQube**: `http://sonarqube.local.hello-there.net` -> Check Quality Gate.
+## 3. DevOps & Security Audit
 
-*   **Relevant Files**:
-    *   **Pipeline**: `Jenkinsfile` (Root directory)
-    *   **Docker**: `docker-compose.yml`
+### CI/CD Pipeline (Jenkins)
+*   **Action**: Check Jenkins History (`http://jenkins.local.hello-there.net`).
+*   **Verify**:
+    1.  **Conditional Execution**: Pipeline skips "Test Frontend" if `package.json` is missing (smart pipeline).
+    2.  **SonarQube Integration**: Analysis runs automatically. Note: `frontend` is excluded if missing.
 
-## 6. Bonus Features
-**Q: Wishlist & Payment Methods.**
+### Code Quality (SonarQube)
+*   **Action**: Check SonarQube Dashboard (`http://sonarqube.local.hello-there.net`).
+*   **Verify**:
+    1.  **Quality Gate**: Passing (Green).
+    2.  **Coverage**: `MediaService` logic is fully covered by unit tests.
 
-*   **Verification**:
-    1.  **Wishlist**: Click Heart icon on product -> Check Wishlist page.
-    2.  **Payment**: Select "Stripe" at checkout (if enabled) or "Pay on Delivery".
-
-*   **Relevant Files**:
-    *   **Wishlist Service**: `services/user-service/src/main/java/com/buy01/userservice/service/UserService.java` (toggleWishlist method)
-    *   **Strategy Pattern**: `services/order-service/src/main/java/com/buy01/orderservice/service/payment/PaymentStrategy.java`
+### Security
+*   **Action**: Attempt to access Seller Dashboard as a Client.
+*   **Verify**:
+    1.  **Access Denied**: 403 Forbidden or Redirect.
+    2.  **Implementation**: `JwtAuthenticationFilter` validates tokens and roles at the gateway/service level.

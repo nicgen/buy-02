@@ -67,7 +67,8 @@ public class MediaService {
 
     public Media getMedia(String id) {
         return mediaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Media not found"));
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Media not found"));
     }
 
     public byte[] getMediaData(String id) throws IOException {

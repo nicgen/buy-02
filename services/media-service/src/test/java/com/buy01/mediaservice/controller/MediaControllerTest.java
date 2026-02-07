@@ -27,6 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 class MediaControllerTest {
 
+    private static final String TEST_FILENAME = "test.png";
+    private static final String TEST_CONTENT_TYPE = "image/png";
+    private static final String TEST_USER = "user1";
+
     @Mock
     private MediaService mediaService;
 
@@ -43,24 +47,24 @@ class MediaControllerTest {
     @Test
     void uploadMedia_shouldReturnOk() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
-                "file", "test.png", "image/png", "content".getBytes());
+                "file", TEST_FILENAME, TEST_CONTENT_TYPE, "content".getBytes());
 
-        Media mockMedia = new Media("test.png", "image/png", "uuid_test.png", "user1");
-        when(mediaService.uploadMedia(any(), eq("user1"))).thenReturn(mockMedia);
+        Media mockMedia = new Media(TEST_FILENAME, TEST_CONTENT_TYPE, "uuid_" + TEST_FILENAME, TEST_USER);
+        when(mediaService.uploadMedia(any(), eq(TEST_USER))).thenReturn(mockMedia);
 
-        Principal mockPrincipal = () -> "user1";
+        Principal mockPrincipal = () -> TEST_USER;
 
         mockMvc.perform(multipart("/api/media/upload")
                 .file(file)
                 .principal(mockPrincipal))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("test.png"));
+                .andExpect(jsonPath("$.name").value(TEST_FILENAME));
     }
 
     @Test
     void getMedia_shouldReturnFileContent() throws Exception {
         String mediaId = "123";
-        Media mockMedia = new Media("test.png", "image/png", "uuid_test.png", "user1");
+        Media mockMedia = new Media(TEST_FILENAME, TEST_CONTENT_TYPE, "uuid_" + TEST_FILENAME, TEST_USER);
         byte[] content = "file-content".getBytes(StandardCharsets.UTF_8);
 
         when(mediaService.getMedia(mediaId)).thenReturn(mockMedia);

@@ -7,6 +7,8 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class StripeStrategy implements PaymentStrategy {
                 .setSuccessUrl(frontendUrl + "/orders")
                 .setCancelUrl(frontendUrl + "/cart")
                 .addAllLineItem(lineItems)
-                .putMetadata("orderId", order.getId()) // Only works if order is saved first or we generate ID
+                .putMetadata("orderId", order.getId())
                 .setCustomerEmail(order.getCustomerEmail())
                 .build();
 
@@ -68,7 +70,7 @@ public class StripeStrategy implements PaymentStrategy {
             response.put("sessionId", session.getId());
             return response;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create Stripe session", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create Stripe session", e);
         }
     }
 }

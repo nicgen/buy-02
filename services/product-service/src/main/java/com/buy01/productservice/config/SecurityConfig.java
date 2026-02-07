@@ -20,6 +20,9 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String SELLER_ROLE = "SELLER";
+    private static final String PRODUCTS_API = "/api/products/**";
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -32,11 +35,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/products/seller").hasRole("SELLER")
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("SELLER")
-                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("SELLER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("SELLER")
+                        .requestMatchers("/api/products/seller").hasRole(SELLER_ROLE)
+                        .requestMatchers(HttpMethod.GET, PRODUCTS_API).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole(SELLER_ROLE)
+                        .requestMatchers(HttpMethod.PUT, PRODUCTS_API).hasRole(SELLER_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, PRODUCTS_API).hasRole(SELLER_ROLE)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

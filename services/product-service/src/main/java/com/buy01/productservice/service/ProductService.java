@@ -2,7 +2,9 @@ package com.buy01.productservice.service;
 
 import com.buy01.productservice.model.Product;
 import com.buy01.productservice.repository.ProductRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -38,10 +40,10 @@ public class ProductService {
 
     public Product updateProduct(String id, Product product, String sellerId) {
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         if (!existingProduct.getSellerId().equals(sellerId)) {
-            throw new RuntimeException("Unauthorized to update this product");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized to update this product");
         }
 
         existingProduct.setName(product.getName());
@@ -54,10 +56,10 @@ public class ProductService {
 
     public void deleteProduct(String id, String sellerId) {
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         if (!existingProduct.getSellerId().equals(sellerId)) {
-            throw new RuntimeException("Unauthorized to delete this product");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized to delete this product");
         }
 
         productRepository.deleteById(id);

@@ -20,6 +20,8 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String SELLER_ROLE = "SELLER";
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -32,9 +34,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/orders/stats/seller").hasRole("SELLER")
-                        .requestMatchers("/api/orders/all").hasRole("SELLER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasRole("SELLER")
+                        .requestMatchers("/api/orders/stats/seller").hasRole(SELLER_ROLE)
+                        .requestMatchers("/api/orders/all").hasRole(SELLER_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/*/status").hasRole(SELLER_ROLE)
                         .requestMatchers("/api/orders/**").authenticated() // User routes
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

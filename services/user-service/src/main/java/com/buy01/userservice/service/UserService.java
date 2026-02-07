@@ -5,8 +5,10 @@ import com.buy01.userservice.dto.AuthResponse;
 import com.buy01.userservice.model.User;
 import com.buy01.userservice.repository.UserRepository;
 import com.buy01.userservice.security.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserService {
@@ -14,6 +16,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    private static final String USER_NOT_FOUND = "User not found";
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
@@ -23,7 +27,7 @@ public class UserService {
 
     public AuthResponse register(AuthRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
         User user = new User(
                 request.getEmail(),
@@ -36,10 +40,10 @@ public class UserService {
 
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
         }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getId());
@@ -48,7 +52,7 @@ public class UserService {
 
     public void updateUser(String email, com.buy01.userservice.dto.UpdateUserRequest request) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
 
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -69,7 +73,7 @@ public class UserService {
 
     public com.buy01.userservice.dto.UserProfileResponse getProfile(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
         return new com.buy01.userservice.dto.UserProfileResponse(
                 user.getId(),
                 user.getEmail(),
@@ -83,7 +87,7 @@ public class UserService {
 
     public void toggleWishlist(String userId, String productId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
 
         if (user.getWishlist().contains(productId)) {
             user.getWishlist().remove(productId);
@@ -95,7 +99,7 @@ public class UserService {
 
     public java.util.List<String> getWishlist(String userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, USER_NOT_FOUND));
         return user.getWishlist();
     }
 }
