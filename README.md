@@ -40,6 +40,13 @@ docker compose up -d --build
 
 Import the `insomnia_export.json` file into [Insomnia](https://insomnia.rest/) to test all API endpoints.
 
+### Unit Tests
+
+To run unit tests for all services (and verify coverage requirements):
+```bash
+mvn test
+```
+
 ## Storage
 
 -   **Database**: Stored in a Docker volume.
@@ -68,6 +75,7 @@ make sonarqube
 
 -   **Access**: [https://sonarqube.local.example.com](https://sonarqube.local.example.com)
 -   **Setup Guide**: See [GUIDE.md](GUIDE.md) for detailed configuration steps.
+-   **Note**: `calculate_coverage.py` and DTOs are excluded from analysis to focus on source code quality.
 
 ## CI/CD (Jenkins)
 

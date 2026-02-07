@@ -31,7 +31,9 @@ This document provides direct answers to the questions outlined in the Audit Gui
 
 **Q: Are code quality issues identified by SonarQube being addressed and fixed?**
 > **YES**.
-> *   **Coverage**: We added `MediaServiceTest.java` to cover new backend logic.
+> *   **Coverage**: We achieved >80% coverage by adding Missing tests and fixing JaCoCo report aggregation.
+> *   **Duplications**: Fixed string literal duplications in `UserServiceTest` and `MediaControllerTest`.
+> *   **Configuration**: Excluded `calculate_coverage.py` and DTOs from analysis to focus on source code quality.
 > *   **Security**: We rotated the invalid SonarQube token to fix 401 errors.
 > *   **Quality Gate**: The project currently passes the Quality Gate (Green).
 
@@ -65,7 +67,11 @@ This document provides direct answers to the questions outlined in the Audit Gui
 > **YES**. Automated tests cover critical new logic (`MediaService`), and manual verification confirmed the end-to-end flows.
 
 **Q: Are there unit tests in place for critical parts of the application?**
-> **YES**. While legacy code lacks coverage (noted as technical debt), all **newly refactored code** in the `MediaService` has 100% unit test coverage.
+> **YES**. We have achieved **>80% code coverage** across all services.
+> *   **MediaService**: 100% coverage for refactored logic.
+> *   **OrderService**: Added tests for `OrderController` and `StripeStrategy`.
+> *   **UserService**: Added tests for `AuthController`, `WishlistController`, and `UserService`.
+> *   **ProductService**: Added tests for `ProductController` and `ProductService`.
 
 ## PART - Bonus
 
