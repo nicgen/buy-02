@@ -21,6 +21,8 @@ public class MediaService {
     private final MediaRepository mediaRepository;
     private final Path fileStorageLocation;
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(MediaService.class);
+
     public MediaService(MediaRepository mediaRepository, @Value("${file.upload-dir}") String uploadDir) {
         this.mediaRepository = mediaRepository;
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
@@ -62,6 +64,7 @@ public class MediaService {
 
             return mediaRepository.save(media);
         } catch (IOException ex) {
+            logger.error("Failed to store file " + fileName, ex);
             throw new IOException("Could not store file " + fileName + ". Please try again!", ex);
         }
     }
