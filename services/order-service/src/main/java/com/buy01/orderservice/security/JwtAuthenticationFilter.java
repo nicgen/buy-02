@@ -48,16 +48,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.info("No Bearer token found in Authorization header for URI: {}", request.getRequestURI());
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtUtil.validateToken(token)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        username, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                logger.info("Authentication set for user: {}", username);
-            } else {
-                logger.warn("Token validation failed for user: {}", username);
-            }
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null
+                && jwtUtil.validateToken(token)) {
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    username, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            logger.info("Authentication set for user: {}", username);
+        } else {
+            logger.warn("Token validation failed or user not found for user: {}", username);
         }
         filterChain.doFilter(request, response);
     }

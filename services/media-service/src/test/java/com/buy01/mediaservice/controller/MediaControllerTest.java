@@ -72,7 +72,7 @@ class MediaControllerTest {
 
         mockMvc.perform(get("/api/media/{id}", mediaId))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Disposition", "inline; filename=\"test.png\""))
+                .andExpect(header().string("Content-Disposition", "inline; filename=\"" + TEST_FILENAME + "\""))
                 .andExpect(content().contentType(MediaType.IMAGE_PNG))
                 .andExpect(content().bytes(content));
     }

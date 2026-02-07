@@ -27,6 +27,9 @@ class MediaServiceTest {
 
     private MediaService mediaService;
 
+    private static final String IMAGE_PNG = "image/png";
+    private static final String USER_ID = "user1";
+
     @TempDir
     Path tempDir;
 
@@ -40,12 +43,12 @@ class MediaServiceTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test-image.png",
-                "image/png",
+                IMAGE_PNG,
                 "test content".getBytes());
 
         when(mediaRepository.save(any(Media.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Media savedMedia = mediaService.uploadMedia(file, "user123");
+        Media savedMedia = mediaService.uploadMedia(file, USER_ID);
 
         assertNotNull(savedMedia);
         // CRITICAL: Verify we are storing only the filename (relative path), not the
@@ -61,7 +64,7 @@ class MediaServiceTest {
         Path filePath = tempDir.resolve(filename);
         Files.write(filePath, "content".getBytes());
 
-        Media media = new Media("relative.png", "image/png", filename, "user1");
+        Media media = new Media("relative.png", IMAGE_PNG, filename, USER_ID);
         when(mediaRepository.findById("1")).thenReturn(Optional.of(media));
 
         byte[] data = mediaService.getMediaData("1");
@@ -82,7 +85,7 @@ class MediaServiceTest {
         Path realFilePath = tempDir.resolve(filename);
         Files.write(realFilePath, "legacy content".getBytes());
 
-        Media media = new Media("Legacy", "image/png", oldAbsolutePath, "user1");
+        Media media = new Media("Legacy", IMAGE_PNG, oldAbsolutePath, USER_ID);
         when(mediaRepository.findById("2")).thenReturn(Optional.of(media));
 
         byte[] data = mediaService.getMediaData("2");
@@ -92,7 +95,7 @@ class MediaServiceTest {
 
     @Test
     void getMediaData_shouldThrowException_WhenFileNotFound() {
-        Media media = new Media("Missing", "image/png", "missing.png", "user1");
+        Media media = new Media("Missing", IMAGE_PNG, "missing.png", USER_ID);
         when(mediaRepository.findById("3")).thenReturn(Optional.of(media));
 
         assertThrows(IOException.class, () -> mediaService.getMediaData("3"));
