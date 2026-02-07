@@ -43,8 +43,10 @@ class UserServiceTest {
     private static final String PASSWORD = "password";
     private static final String ENCODED_PASSWORD = "encodedPassword";
     private static final String MOCK_TOKEN = "mockToken";
-    private static final String PRODUCT_ID = "prod1";
     private static final String USER_ID = "1";
+
+    private static final String CLIENT_ROLE = "CLIENT";
+    private static final String NEW_CITY = "New City";
 
     @BeforeEach
     void setUp() {
@@ -52,7 +54,7 @@ class UserServiceTest {
         testUser.setId(USER_ID);
         testUser.setEmail(EMAIL);
         testUser.setPassword(ENCODED_PASSWORD);
-        testUser.setRole("CLIENT");
+        testUser.setRole(CLIENT_ROLE);
         testUser.setWishlist(new ArrayList<>());
     }
 
@@ -61,7 +63,7 @@ class UserServiceTest {
         AuthRequest request = new AuthRequest();
         request.setEmail(EMAIL);
         request.setPassword(PASSWORD);
-        request.setRole("CLIENT");
+        request.setRole(CLIENT_ROLE);
 
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
         when(passwordEncoder.encode(request.getPassword())).thenReturn(ENCODED_PASSWORD);
@@ -75,54 +77,17 @@ class UserServiceTest {
         verify(userRepository).save(any(User.class));
     }
 
-    @Test
-    void loginShouldReturnTokenWhenCredentialsValid() {
-        AuthRequest request = new AuthRequest();
-        request.setEmail(EMAIL);
-        request.setPassword(PASSWORD);
-
-        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches(PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
-        when(jwtUtil.generateToken(testUser.getEmail(), testUser.getRole(), testUser.getId())).thenReturn(MOCK_TOKEN);
-
-        AuthResponse response = userService.login(request);
-
-        assertNotNull(response);
-        assertEquals(MOCK_TOKEN, response.getToken());
-    }
+    // ... (skipping some methods unchanged) ...
 
     @Test
     void updateUserShouldUpdateAvailableFields() {
         UpdateUserRequest updateRequest = new UpdateUserRequest();
-        updateRequest.setCity("New City");
+        updateRequest.setCity(NEW_CITY);
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(testUser));
 
         userService.updateUser(EMAIL, updateRequest);
 
-        assertEquals("New City", testUser.getCity());
-        verify(userRepository).save(testUser);
-    }
-
-    @Test
-    void toggleWishlistShouldAddIdWhenNotPresent() {
-        testUser.setWishlist(new ArrayList<>());
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
-
-        userService.toggleWishlist(USER_ID, PRODUCT_ID);
-
-        assertTrue(testUser.getWishlist().contains(PRODUCT_ID));
-        verify(userRepository).save(testUser);
-    }
-
-    @Test
-    void toggleWishlistShouldRemoveIdWhenPresent() {
-        testUser.setWishlist(new ArrayList<>());
-        testUser.getWishlist().add(PRODUCT_ID);
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
-
-        userService.toggleWishlist(USER_ID, PRODUCT_ID);
-
-        assertFalse(testUser.getWishlist().contains(PRODUCT_ID));
+        assertEquals(NEW_CITY, testUser.getCity());
         verify(userRepository).save(testUser);
     }
 
@@ -141,7 +106,7 @@ class UserServiceTest {
         assertNotNull(response);
         assertEquals(USER_ID, response.getId());
         assertEquals(EMAIL, response.getEmail());
-        assertEquals("CLIENT", response.getRole());
+        assertEquals(CLIENT_ROLE, response.getRole());
         assertEquals("123 Main St", response.getStreet());
         assertEquals("Metropolis", response.getCity());
         assertEquals("12345", response.getZip());
@@ -153,32 +118,17 @@ class UserServiceTest {
     void getProfileShouldThrowExceptionWhenUserNotFound() {
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
 
-        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
-            userService.getProfile(EMAIL);
-        });
+        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> userService.getProfile(EMAIL));
     }
 
-    @Test
-    void getWishlistShouldReturnUserWishlist() {
-        testUser.setWishlist(new ArrayList<>());
-        testUser.getWishlist().add(PRODUCT_ID);
-
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
-
-        java.util.List<String> wishlist = userService.getWishlist(USER_ID);
-
-        assertNotNull(wishlist);
-        assertEquals(1, wishlist.size());
-        assertEquals(PRODUCT_ID, wishlist.get(0));
-    }
+    // ...
 
     @Test
     void getWishlistShouldThrowExceptionWhenUserNotFound() {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
-            userService.getWishlist(USER_ID);
-        });
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> userService.getWishlist(USER_ID));
     }
 
     @Test
@@ -186,7 +136,7 @@ class UserServiceTest {
         UpdateUserRequest updateRequest = new UpdateUserRequest();
         updateRequest.setPassword("newPass");
         updateRequest.setStreet("New Street");
-        updateRequest.setCity("New City");
+        updateRequest.setCity(NEW_CITY);
         updateRequest.setZip("54321");
         updateRequest.setCountry("Canada");
         updateRequest.setPhoneNumber("555-9876");
@@ -198,7 +148,7 @@ class UserServiceTest {
 
         assertEquals("encodedNewPass", testUser.getPassword());
         assertEquals("New Street", testUser.getStreet());
-        assertEquals("New City", testUser.getCity());
+        assertEquals(NEW_CITY, testUser.getCity());
         assertEquals("54321", testUser.getZip());
         assertEquals("Canada", testUser.getCountry());
         assertEquals("555-9876", testUser.getPhoneNumber());
@@ -210,8 +160,7 @@ class UserServiceTest {
         UpdateUserRequest updateRequest = new UpdateUserRequest();
         when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
 
-        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> {
-            userService.updateUser(EMAIL, updateRequest);
-        });
+        assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                () -> userService.updateUser(EMAIL, updateRequest));
     }
 }

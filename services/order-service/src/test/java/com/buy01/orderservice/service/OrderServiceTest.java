@@ -153,8 +153,6 @@ class OrderServiceTest {
     void updateOrderStatusShouldThrowExceptionWhenOrderNotFound() {
         when(orderRepository.findById("999")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
-            orderService.updateOrderStatus("999", OrderStatus.DELIVERED);
-        });
+        assertThrows(RuntimeException.class, () -> orderService.updateOrderStatus("999", OrderStatus.DELIVERED));
     }
 }
