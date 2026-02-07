@@ -45,7 +45,7 @@ class MediaControllerTest {
     }
 
     @Test
-    void uploadMedia_shouldReturnOk() throws Exception {
+    void uploadMediaShouldReturnOk() throws Exception {
         MockMultipartFile file = new MockMultipartFile(
                 "file", TEST_FILENAME, TEST_CONTENT_TYPE, "content".getBytes());
 
@@ -62,7 +62,7 @@ class MediaControllerTest {
     }
 
     @Test
-    void getMedia_shouldReturnFileContent() throws Exception {
+    void getMediaShouldReturnFileContent() throws Exception {
         String mediaId = "123";
         Media mockMedia = new Media(TEST_FILENAME, TEST_CONTENT_TYPE, "uuid_" + TEST_FILENAME, TEST_USER);
         byte[] content = "file-content".getBytes(StandardCharsets.UTF_8);
@@ -78,7 +78,7 @@ class MediaControllerTest {
     }
 
     @Test
-    void getSellerMedia_shouldReturnList() throws Exception {
+    void getSellerMediaShouldReturnList() throws Exception {
         Principal mockPrincipal = () -> "seller1";
         when(mediaService.getMediaByUploader("seller1")).thenReturn(Collections.emptyList());
 

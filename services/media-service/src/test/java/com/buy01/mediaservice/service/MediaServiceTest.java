@@ -39,7 +39,7 @@ class MediaServiceTest {
     }
 
     @Test
-    void uploadMedia_shouldStoreRelativePath() throws IOException {
+    void uploadMediaShouldStoreRelativePath() throws IOException {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test-image.png",
@@ -59,7 +59,7 @@ class MediaServiceTest {
     }
 
     @Test
-    void getMediaData_shouldResolveRelativePath() throws IOException {
+    void getMediaDataShouldResolveRelativePath() throws IOException {
         String filename = "relative.png";
         Path filePath = tempDir.resolve(filename);
         Files.write(filePath, "content".getBytes());
@@ -73,7 +73,7 @@ class MediaServiceTest {
     }
 
     @Test
-    void getMediaData_shouldFallbackToRelative_WhenAbsolutePathIsBroken() throws IOException {
+    void getMediaDataShouldFallbackToRelativeWhenAbsolutePathIsBroken() throws IOException {
         // This simulates the "Repair" scenario:
         // DB has an absolute path from an old deployment: /old/app/uploads/legacy.png
         // But the file actually exists in our current storage at: tempDir/legacy.png
@@ -94,7 +94,7 @@ class MediaServiceTest {
     }
 
     @Test
-    void getMediaData_shouldThrowException_WhenFileNotFound() {
+    void getMediaDataShouldThrowExceptionWhenFileNotFound() {
         Media media = new Media("Missing", IMAGE_PNG, "missing.png", USER_ID);
         when(mediaRepository.findById("3")).thenReturn(Optional.of(media));
 

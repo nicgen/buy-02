@@ -72,9 +72,7 @@ class ProductServiceTest {
         Product updateRequest = new Product();
         updateRequest.setName("Hacked Name");
 
-        assertThrows(RuntimeException.class, () -> {
-            productService.updateProduct(PRODUCT_ID, updateRequest, "hacker");
-        });
+        assertThrows(RuntimeException.class, () -> productService.updateProduct(PRODUCT_ID, updateRequest, "hacker"));
 
         verify(productRepository, never()).save(any(Product.class));
     }
@@ -92,9 +90,7 @@ class ProductServiceTest {
     void deleteProductShouldThrowExceptionWhenSellerIsNotOwner() {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(testProduct));
 
-        assertThrows(RuntimeException.class, () -> {
-            productService.deleteProduct(PRODUCT_ID, "hacker");
-        });
+        assertThrows(RuntimeException.class, () -> productService.deleteProduct(PRODUCT_ID, "hacker"));
 
         verify(productRepository, never()).deleteById(anyString());
     }

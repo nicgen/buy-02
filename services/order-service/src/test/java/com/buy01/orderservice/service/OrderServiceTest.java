@@ -31,7 +31,7 @@ class OrderServiceTest {
     private PaymentStrategy mockPaymentStrategy;
 
     private OrderService orderService;
-    private Map<String, PaymentStrategy> paymentStrategies;
+
     private Order testOrder;
 
     private static final String MOCK_PAYMENT = "MOCK_PAYMENT";
@@ -40,7 +40,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        paymentStrategies = new HashMap<>();
+        Map<String, PaymentStrategy> paymentStrategies = new HashMap<>();
         paymentStrategies.put(MOCK_PAYMENT, mockPaymentStrategy);
         orderService = new OrderService(orderRepository, paymentStrategies);
 
