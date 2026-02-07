@@ -30,6 +30,13 @@ pipeline {
                         }
                     }
                 }
+                stage('Order Service') {
+                    steps {
+                        dir('services/order-service') {
+                            sh 'mvn test'
+                        }
+                    }
+                }
             }
         }
 

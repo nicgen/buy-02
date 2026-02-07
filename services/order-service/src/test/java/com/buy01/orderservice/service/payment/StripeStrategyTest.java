@@ -2,7 +2,6 @@ package com.buy01.orderservice.service.payment;
 
 import com.buy01.orderservice.model.Order;
 import com.buy01.orderservice.model.OrderItem;
-import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.junit.jupiter.api.Test;
