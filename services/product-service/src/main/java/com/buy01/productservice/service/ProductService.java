@@ -29,8 +29,11 @@ public class ProductService {
         return productRepository.findByNameContainingIgnoreCase(query);
     }
 
-    public List<Product> filterProducts(java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice) {
-        return productRepository.findByPriceBetween(minPrice, maxPrice);
+    public List<Product> filterProducts(String query, java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice) {
+        if (query != null && !query.trim().isEmpty()) {
+            return productRepository.findByNameAndPriceRange(query, minPrice.doubleValue(), maxPrice.doubleValue());
+        }
+        return productRepository.findByPriceRange(minPrice.doubleValue(), maxPrice.doubleValue());
     }
 
     public Product createProduct(Product product, String sellerId) {

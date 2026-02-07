@@ -19,6 +19,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -85,16 +86,14 @@ class ProductControllerTest {
 
     @Test
     @WithMockUser
-    void filterProductsShouldReturnList() throws Exception {
-        List<Product> products = Arrays.asList(product);
-        given(productService.filterProducts(any(BigDecimal.class), any(BigDecimal.class)))
-                .willReturn(products);
+    void filterProductsShouldReturnFilteredProducts() throws Exception {
+        when(productService.filterProducts(any(), any(), any())).thenReturn(Arrays.asList(product));
 
         mockMvc.perform(get("/api/products/filter")
-                .param("minPrice", "10")
-                .param("maxPrice", "200"))
+                .param("minPrice", "50")
+                .param("maxPrice", "150"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].price").value(100.00));
+                .andExpect(jsonPath("$[0].name").value("Test Product"));
     }
 
     @Test

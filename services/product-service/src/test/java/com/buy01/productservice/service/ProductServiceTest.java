@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +50,17 @@ class ProductServiceTest {
         assertNotNull(result);
         assertEquals(SELLER_ID, result.getSellerId());
         verify(productRepository).save(any(Product.class));
+    }
+
+    @Test
+    void filterProductsShouldReturnFilteredList() {
+        when(productRepository.findByPriceRange(50.0, 150.0))
+                .thenReturn(Arrays.asList(testProduct));
+
+        List<Product> result = productService.filterProducts(null, new BigDecimal("50"), new BigDecimal("150"));
+
+        assertFalse(result.isEmpty());
+        assertEquals("Test Product", result.get(0).getName());
     }
 
     @Test

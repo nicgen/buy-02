@@ -28,14 +28,18 @@ export class ProductService {
   }
 
   searchProducts(query: string): Observable<any[]> {
+    if (!query) {
+      return this.getAllProducts();
+    }
     const params = new HttpParams().set('query', query);
     return this.http.get<any[]>(`${this.apiUrl}/search`, { params });
   }
 
-  filterProducts(minPrice?: number, maxPrice?: number): Observable<any[]> {
+  filterProducts(minPrice?: number, maxPrice?: number, query?: string): Observable<any[]> {
     let params = new HttpParams();
-    if (minPrice !== undefined) params = params.set('minPrice', minPrice.toString());
-    if (maxPrice !== undefined) params = params.set('maxPrice', maxPrice.toString());
+    if (minPrice !== undefined && minPrice !== null) params = params.set('minPrice', minPrice.toString());
+    if (maxPrice !== undefined && maxPrice !== null) params = params.set('maxPrice', maxPrice.toString());
+    if (query) params = params.set('query', query);
     return this.http.get<any[]>(`${this.apiUrl}/filter`, { params });
   }
 } // End of class. Note: Need to import HttpParams.

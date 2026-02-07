@@ -36,6 +36,7 @@ public class ProductController {
 
     @GetMapping("/filter")
     public ResponseEntity<List<Product>> filterProducts(
+            @RequestParam(required = false) String query,
             @RequestParam(required = false) java.math.BigDecimal minPrice,
             @RequestParam(required = false) java.math.BigDecimal maxPrice) {
 
@@ -44,7 +45,7 @@ public class ProductController {
         if (maxPrice == null)
             maxPrice = new java.math.BigDecimal("1000000"); // Arbitrary large number
 
-        return ResponseEntity.ok(productService.filterProducts(minPrice, maxPrice));
+        return ResponseEntity.ok(productService.filterProducts(query, minPrice, maxPrice));
     }
 
     @PostMapping

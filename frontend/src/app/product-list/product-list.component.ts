@@ -70,21 +70,38 @@ export class ProductListComponent implements OnInit {
   }
 
   onSearch(): void {
+
     if (this.searchQuery) {
       this.productService.searchProducts(this.searchQuery).subscribe({
         next: (data: any[]) => this.products = data,
         error: (err: any) => console.error('Search failed', err)
       });
     } else {
+
       this.loadProducts();
     }
   }
 
   onFilter(): void {
-    this.productService.filterProducts(this.minPrice, this.maxPrice).subscribe({
+
+    this.productService.filterProducts(this.minPrice, this.maxPrice, this.searchQuery).subscribe({
       next: (data: any[]) => this.products = data,
       error: (err: any) => console.error('Filter failed', err)
     });
+  }
+
+  // Explicit binding handlers to fix ngModel issues
+  onSearchChange(val: string): void {
+    this.searchQuery = val;
+
+  }
+
+  onMinPriceChange(val: any): void {
+    this.minPrice = val;
+  }
+
+  onMaxPriceChange(val: any): void {
+    this.maxPrice = val;
   }
 
   onClearFilters(): void {
@@ -96,7 +113,6 @@ export class ProductListComponent implements OnInit {
 
   addToCart(product: any): void {
     this.cartService.addToCart(product);
-    // alert('Product added to cart!');
   }
 
   toggleWishlist(product: any): void {

@@ -4,7 +4,8 @@
         <div class="search-filter-container">
             <mat-form-field appearance="outline">
                 <mat-label>Search</mat-label>
-                <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search products...">
+                <input matInput [ngModel]="searchQuery" (ngModelChange)="onSearchChange($event)" name="searchQuery"
+                    (keyup.enter)="onSearch()" placeholder="Search products...">
                 <button mat-icon-button matSuffix (click)="onSearch()">
                     <mat-icon>search</mat-icon>
                 </button>
@@ -13,11 +14,13 @@
             <div class="filters">
                 <mat-form-field appearance="outline" class="price-input">
                     <mat-label>Min Price</mat-label>
-                    <input matInput type="number" [(ngModel)]="minPrice" placeholder="0">
+                    <input matInput type="number" [ngModel]="minPrice" (ngModelChange)="onMinPriceChange($event)"
+                        name="minPrice" placeholder="0">
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="price-input">
                     <mat-label>Max Price</mat-label>
-                    <input matInput type="number" [(ngModel)]="maxPrice" placeholder="5000">
+                    <input matInput type="number" [ngModel]="maxPrice" (ngModelChange)="onMaxPriceChange($event)"
+                        name="maxPrice" placeholder="5000">
                 </mat-form-field>
                 <button mat-raised-button color="accent" (click)="onFilter()">Filter</button>
                 <button mat-button (click)="onClearFilters()">Clear</button>
