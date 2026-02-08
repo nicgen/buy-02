@@ -30,6 +30,8 @@ class MediaServiceValidationTest {
     Path tempDir;
 
     private static final String USER_ID = "user123";
+    private static final String IMAGE_PNG = "image/png";
+    private static final byte[] CONTENT = "content".getBytes();
 
     @BeforeEach
     void setUp() {
@@ -41,14 +43,14 @@ class MediaServiceValidationTest {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test.png",
-                "image/png",
-                "content".getBytes());
+                IMAGE_PNG,
+                CONTENT);
 
         when(mediaRepository.save(any(Media.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Media media = mediaService.uploadMedia(file, USER_ID);
         assertNotNull(media);
-        assertEquals("image/png", media.getType());
+        assertEquals(IMAGE_PNG, media.getType());
     }
 
     @Test
@@ -59,7 +61,7 @@ class MediaServiceValidationTest {
                 "file",
                 "screenshot.png",
                 "application/octet-stream",
-                "content".getBytes());
+                CONTENT);
 
         when(mediaRepository.save(any(Media.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -74,7 +76,7 @@ class MediaServiceValidationTest {
                 "file",
                 "document.pdf",
                 "application/pdf",
-                "content".getBytes());
+                CONTENT);
 
         IOException exception = assertThrows(IOException.class, () -> {
             mediaService.uploadMedia(file, USER_ID);
@@ -85,12 +87,12 @@ class MediaServiceValidationTest {
 
     @Test
     void uploadMediaShouldFailIfTooLarge() {
-        // Create a file slightly larger than 10MB
-        byte[] largeContent = new byte[(10 * 1024 * 1024) + 100];
+        // Create a file slightly larger than 8MB
+        byte[] largeContent = new byte[(8 * 1024 * 1024) + 100];
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "large.png",
-                "image/png",
+                IMAGE_PNG,
                 largeContent);
 
         IOException exception = assertThrows(IOException.class, () -> {

@@ -39,9 +39,9 @@ public class MediaService {
         logger.info("Starting uploadMedia: filename={}, size={}, contentType={}",
                 file.getOriginalFilename(), file.getSize(), file.getContentType());
 
-        if (file.getSize() > 10 * 1024 * 1024) {
+        if (file.getSize() > 8 * 1024 * 1024) {
             logger.error("File size exceeded: {} bytes", file.getSize());
-            throw new IOException("File size exceeds the limit of 10MB");
+            throw new IOException("File size exceeds the limit of 8MB");
         }
 
         String originalFilename = file.getOriginalFilename();
