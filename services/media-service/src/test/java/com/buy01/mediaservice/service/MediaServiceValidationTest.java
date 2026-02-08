@@ -78,9 +78,7 @@ class MediaServiceValidationTest {
                 "application/pdf",
                 CONTENT);
 
-        IOException exception = assertThrows(IOException.class, () -> {
-            mediaService.uploadMedia(file, USER_ID);
-        });
+        IOException exception = assertThrows(IOException.class, () -> mediaService.uploadMedia(file, USER_ID));
 
         assertEquals("Only image files are allowed", exception.getMessage());
     }
@@ -95,9 +93,7 @@ class MediaServiceValidationTest {
                 IMAGE_PNG,
                 largeContent);
 
-        IOException exception = assertThrows(IOException.class, () -> {
-            mediaService.uploadMedia(file, USER_ID);
-        });
+        IOException exception = assertThrows(IOException.class, () -> mediaService.uploadMedia(file, USER_ID));
 
         assertTrue(exception.getMessage().contains("File size exceeds the limit"));
     }
